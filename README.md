@@ -1,2 +1,2 @@
-# okta-vue
-OIDC SDK for Vue
+# okta-oidc-js
+okta-oidc-js
