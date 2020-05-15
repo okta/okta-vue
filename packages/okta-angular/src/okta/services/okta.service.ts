@@ -31,7 +31,7 @@ import { Observable, Observer } from 'rxjs';
 
 @Injectable()
 export class OktaAuthService {
-    private oktaAuth: OktaAuth;
+    oktaAuth: OktaAuth;
     private config: OktaConfig;
     private observers: Observer<boolean>[];
     $authenticationState: Observable<boolean>;

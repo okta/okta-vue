@@ -149,6 +149,11 @@ describe('Angular service', () => {
     expect(service['oktaAuth'].userAgent.indexOf(`@okta/okta-angular/${PACKAGE_JSON.version}`)).toBeGreaterThan(-1);
   });
 
+  it('Exposes the internal oktaAuth instance', () => {
+    const service:OktaAuthService = createInstance(VALID_CONFIG)();
+    expect(service.oktaAuth).toBeTruthy();
+  });
+
   it('Can create the service via angular injection', () => {
     TestBed.configureTestingModule({
       imports: [

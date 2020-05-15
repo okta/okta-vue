@@ -350,6 +350,10 @@ Returns the URI stored when the `OktaAuthGuard` and/or `setFromUri` was used.
 
 Returns the internal [TokenManager](https://github.com/okta/okta-auth-js#tokenmanager).
 
+#### `oktaAuth.oktaAuth`
+
+The internal [Okta Auth SDK][] instance.
+
 ## Contributing
 
 We welcome contributions to all of our open-source packages. Please see the [contribution guide](https://github.com/okta/okta-oidc-js/blob/master/CONTRIBUTING.md) to understand how to structure a contribution.
