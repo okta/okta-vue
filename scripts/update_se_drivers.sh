@@ -5,7 +5,8 @@ SCRIPT_DIR="${SCRIPT_PATH%scripts}"
 DIR_MARKER="../"
 DEFAULT_STANDALONE_VER=latest
 DEFAULT_CHROME_DRIVER_VER=2.46
-NODE_MODULES="${PWD}/node_modules"
+#NODE_MODULES="${PWD}/node_modules"
+NODE_MODULES="$SCRIPT_PATH/../node_modules"
 DEPTH=$1
 
 function setCallDepth() {

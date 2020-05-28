@@ -12,6 +12,7 @@
 </template>
 
 <script>
+/* global CONFIG */
 import OktaAuth from '@okta/okta-auth-js'
 
 export default {
@@ -21,7 +22,7 @@ export default {
   },
   methods: {
     signIn () {
-      const authJS = new OktaAuth({ url: process.env.ISSUER.split('/oauth2/')[0] })
+      const authJS = new OktaAuth({ url: CONFIG.ISSUER.split('/oauth2/')[0] })
 
       authJS.signIn({
         username: this.username,

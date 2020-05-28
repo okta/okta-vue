@@ -2,13 +2,14 @@ var path = require('path')
 var webpack = require('webpack')
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var VueLoaderPlugin = require('vue-loader/lib/plugin')
+var ENV = require('./env')()
 
 module.exports = {
   entry: './src/okta-vue.js',
   output: {
-    path: path.resolve(__dirname, './dist'),
-    publicPath: '/dist/',
-    filename: 'okta-vue.js'
+    path: path.resolve(__dirname, './dist/bundles'),
+    publicPath: '/bundles/',
+    filename: 'okta-vue.umd.js'
   },
   module: {
     rules: [
@@ -54,7 +55,8 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"'
-      }
+      },
+      'PACKAGE': JSON.stringify(ENV.packageInfo)
     }),
     new VueLoaderPlugin(),
     new webpack.LoaderOptionsPlugin({

@@ -1,7 +1,10 @@
+/* global PACKAGE */
 import { buildConfigObject } from '@okta/configuration-validation'
 import AuthJS from '@okta/okta-auth-js'
 import initConfig from './config'
-import packageInfo from './packageInfo'
+
+// Constants are defined in webpack.config.js
+const packageInfo = PACKAGE
 
 export default class Auth {
   constructor (config) {

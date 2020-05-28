@@ -1,9 +1,9 @@
 // For authoring Nightwatch tests, see
 // http://nightwatchjs.org/guide#usage
-
 module.exports = {
   beforeEach: function (browser) {
     this.devServer = browser.globals.devServerURL
+    this.config = browser.globals.CONFIG
   },
 
   'PKCE: redirects to Okta for login when trying to access a protected page': function (browser) {
@@ -14,8 +14,8 @@ module.exports = {
       .waitForElementVisible('#okta-signin-username', 5000)
       .waitForElementVisible('#okta-signin-password', 5000)
       .waitForElementVisible('#okta-signin-submit', 1000)
-      .setValue('#okta-signin-username', process.env.USERNAME)
-      .setValue('#okta-signin-password', process.env.PASSWORD)
+      .setValue('#okta-signin-username', this.config.USERNAME)
+      .setValue('#okta-signin-password', this.config.PASSWORD)
       .click('#okta-signin-submit')
       .waitForElementVisible('#app', 20000)
 
@@ -40,8 +40,8 @@ module.exports = {
       .waitForElementVisible('#okta-signin-username', 5000)
       .waitForElementVisible('#okta-signin-password', 5000)
       .waitForElementVisible('#okta-signin-submit', 1000)
-      .setValue('#okta-signin-username', process.env.USERNAME)
-      .setValue('#okta-signin-password', process.env.PASSWORD)
+      .setValue('#okta-signin-username', this.config.USERNAME)
+      .setValue('#okta-signin-password', this.config.PASSWORD)
       .click('#okta-signin-submit')
       .waitForElementVisible('#app', 20000)
 
@@ -62,8 +62,8 @@ module.exports = {
       .waitForElementVisible('#okta-signin-username', 5000)
       .waitForElementVisible('#okta-signin-password', 5000)
       .waitForElementVisible('#okta-signin-submit', 1000)
-      .setValue('#okta-signin-username', process.env.USERNAME)
-      .setValue('#okta-signin-password', process.env.PASSWORD)
+      .setValue('#okta-signin-username', this.config.USERNAME)
+      .setValue('#okta-signin-password', this.config.PASSWORD)
       .click('#okta-signin-submit')
       .waitForElementVisible('#app', 20000)
 
@@ -88,8 +88,8 @@ module.exports = {
       .waitForElementVisible('#okta-signin-username', 5000)
       .waitForElementVisible('#okta-signin-password', 5000)
       .waitForElementVisible('#okta-signin-submit', 1000)
-      .setValue('#okta-signin-username', process.env.USERNAME)
-      .setValue('#okta-signin-password', process.env.PASSWORD)
+      .setValue('#okta-signin-username', this.config.USERNAME)
+      .setValue('#okta-signin-password', this.config.PASSWORD)
       .click('#okta-signin-submit')
       .waitForElementVisible('#app', 20000)
 
@@ -109,8 +109,8 @@ module.exports = {
       .waitForElementVisible('#app', 5000)
       .waitForElementVisible('#username', 1000)
       .waitForElementVisible('#password', 1000)
-      .setValue('#username', process.env.USERNAME)
-      .setValue('#password', process.env.PASSWORD)
+      .setValue('#username', this.config.USERNAME)
+      .setValue('#password', this.config.PASSWORD)
       .click('#submit')
       .waitForElementVisible('#logout-button', 20000)
 

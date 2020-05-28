@@ -1,5 +1,5 @@
-require('babel-register')
 var config = require('../../config')
+
 // http://nightwatchjs.org/gettingstarted#settings-file
 module.exports = {
   src_folders: ['test/e2e/specs'],
@@ -8,11 +8,11 @@ module.exports = {
 
   selenium: {
     start_process: true,
-    server_path: 'node_modules/webdriver-manager/selenium/selenium-server-standalone.jar',
+    server_path: '../../node_modules/webdriver-manager/selenium/selenium-server-standalone.jar',
     host: '127.0.0.1',
     port: 4444,
     cli_args: {
-      'webdriver.chrome.driver': 'node_modules/webdriver-manager/selenium/chromedriver'
+      'webdriver.chrome.driver': '../../node_modules/webdriver-manager/selenium/chromedriver'
     }
   },
 
@@ -22,7 +22,8 @@ module.exports = {
       selenium_host: 'localhost',
       silent: true,
       globals: {
-        devServerURL: 'http://localhost:' + (process.env.PORT || config.dev.port)
+        devServerURL: 'http://localhost:' + (process.env.PORT || config.dev.port),
+        CONFIG: require('../../config/dev.env') // SPA config
       }
     },
 
