@@ -1,0 +1,79 @@
+{
+  "name": "@okta/okta-vue",
+  "version": "2.0.0",
+  "description": "Vue support for Okta",
+  "main": "dist/okta-vue.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rimraf dist/ && cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p",
+    "lint": "eslint --ext .js,.vue src",
+    "prepare": "yarn build",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/okta/okta-vue.git"
+  },
+  "keywords": [
+    "oauth2"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/okta/okta-vue/issues"
+  },
+  "homepage": "https://github.com/okta/okta-vue#readme",
+  "dependencies": {
+    "@okta/configuration-validation": "^0.4.1",
+    "@okta/okta-auth-js": "^3.0.1",
+    "cross-env": "^5.1.1",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "^1.0.0-beta.12",
+    "autoprefixer": "^7.1.2",
+    "babel-core": "^6.22.1",
+    "babel-eslint": "^7.1.1",
+    "babel-jest": "^23.0.0-alpha.0",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-transform-runtime": "^6.22.0",
+    "babel-preset-env": "^1.3.2",
+    "babel-preset-stage-2": "^6.22.0",
+    "babel-register": "^6.22.0",
+    "chalk": "^2.0.1",
+    "eslint": "^3.19.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-loader": "^1.7.1",
+    "eslint-plugin-html": "^3.0.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jest": "^21.15.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "jest": "^23.6.0",
+    "rimraf": "^2.6.2",
+    "uglifyjs-webpack-plugin": "^1.1.1",
+    "url-loader": "^1.1.1",
+    "vue-jest": "^2.1.1",
+    "vue-loader": "15.4.2",
+    "vue-style-loader": "^3.0.1",
+    "vue-template-compiler": "^2.5.2",
+    "wait-for-expect": "^3.0.0",
+    "webpack": "^4.20.0",
+    "webpack-cli": "^3.1.2"
+  },
+  "engines": {
+    "node": ">= 4.0.0",
+    "yarn": ">= 1.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
