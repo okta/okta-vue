@@ -1,0 +1,40 @@
+node_modules
+npm-debug.log
+.DS_STORE
+.envrc
+.yarnrc
+*.code-workspace
+lerna-debug.log
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+dist
+testenv
+
+# Ignore TCK-related files in all folders
+okta-oidc-tck*
+tck-keystore.pem
+target
+packages/okta-vue/test/e2e/harness/config/dev.env.js
+packages/okta-vue/test/e2e/harness/chromedriver.zip
+packages/okta-vue/test/e2e/harness/test/e2e/lib
+
+# package info files are generated during build and included in final artifacts
+packageInfo.js
+packageInfo.ts
+coverage
+*.tgz
+.idea/
+
+# test reports
+packages/*/reports/
+
+# android/ios related for react native
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+build/
+local.properties
+*.iml
+xcuserdata/

@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "dotenv": "^8.1.0",
+    "eslint": "^6.6.0",
+    "eslint-plugin-jasmine": "^2.10.1",
+    "eslint-plugin-jest": "^23.0.3",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-protractor": "^2.1.1",
+    "globby": "^6.1.0",
+    "lerna": "^2.11.0"
+  },
+  "engines": {
+    "yarn": "^1.7.0"
+  },
+  "scripts": {
+    "banners": "util/maintain-banners.js",
+    "publish": "lerna publish --skip-npm",
+    "test": "./scripts/runTests.sh",
+    "clean": "./scripts/clean.sh",
+    "postinstall": "./scripts/installPackages.sh"
+  }
+}

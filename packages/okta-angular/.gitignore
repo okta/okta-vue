@@ -1,0 +1,10 @@
+typedocs
+/node_modules
+/dist
+/documentation
+/coverage
+
+*.log
+*.tgz
+
+environment.ts
