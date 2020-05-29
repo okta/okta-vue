@@ -1,4 +1,4 @@
-var ENV = require('../../env')()
+var ENV = require('./env')()
 
 module.exports = {
   'globals': {
@@ -11,8 +11,8 @@ module.exports = {
     'vue'
   ],
   'transform': {
-    '^.+\\.js$': '<rootDir>/../../node_modules/babel-jest',
-    '.*\\.(vue)$': '<rootDir>/../../node_modules/vue-jest'
+    '^.+\\.js$': '<rootDir>/node_modules/babel-jest',
+    '.*\\.(vue)$': '<rootDir>/node_modules/vue-jest'
   },
   'moduleNameMapper': {
     '^@/(.*)$': '<rootDir>/src/$1'

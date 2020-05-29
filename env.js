@@ -1,4 +1,4 @@
-const PACKAGE = require('./packages/okta-vue/package.json')
+const PACKAGE = require('./package.json')
 
 // Support storing environment variables in a file named "testenv"
 const path = require('path')

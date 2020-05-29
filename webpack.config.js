@@ -2,14 +2,14 @@ var path = require('path')
 var webpack = require('webpack')
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var VueLoaderPlugin = require('vue-loader/lib/plugin')
-var ENV = require('../../env')()
+var ENV = require('./env')()
 
 module.exports = {
   entry: './src/okta-vue.js',
   output: {
-    path: path.resolve(__dirname, './dist'),
+    path: path.resolve(__dirname, './build2/dist'),
     publicPath: '/dist/',
-    filename: 'okta-vue.js'
+    filename: 'okta-vue.umd.js'
   },
   module: {
     rules: [

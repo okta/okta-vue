@@ -9,7 +9,7 @@
       "request": "launch",
       "protocol": "auto",
       "name": "okta-vue Jest",
-      "cwd": "${workspaceFolder}/packages/okta-vue",
+      "cwd": "${workspaceFolder}",
       "args": [
         "node_modules/.bin/jest",
         "--runInBand",

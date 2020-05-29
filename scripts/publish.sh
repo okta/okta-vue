@@ -20,10 +20,7 @@ else
   TARGET_BRANCH=${BRANCH}
 fi
 
-# Copy README, CHANGELOG, and CONTRIBUTING to the package directory so they will be published with the the package on npm
-cp ./*.md ./packages/okta-vue/
-
-pushd ./packages/okta-vue
+pushd ./build2
 
 if ! ci-update-package --branch ${TARGET_BRANCH}; then
   echo "ci-update-package failed! Exiting..."
