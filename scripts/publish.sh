@@ -20,7 +20,7 @@ else
   TARGET_BRANCH=${BRANCH}
 fi
 
-pushd ./build2
+pushd ./dist
 
 if ! ci-update-package --branch ${TARGET_BRANCH}; then
   echo "ci-update-package failed! Exiting..."

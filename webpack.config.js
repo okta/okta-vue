@@ -7,8 +7,8 @@ var ENV = require('./env')()
 module.exports = {
   entry: './src/okta-vue.js',
   output: {
-    path: path.resolve(__dirname, './build2/dist'),
-    publicPath: '/dist/',
+    path: path.resolve(__dirname, './dist/bundles'),
+    publicPath: '/bundles/',
     filename: 'okta-vue.umd.js'
   },
   module: {

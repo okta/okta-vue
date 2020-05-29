@@ -3,7 +3,7 @@
   "name": "@okta/okta-vue",
   "version": "2.0.0",
   "description": "Vue support for Okta",
-  "main": "dist/okta-vue.umd.js",
+  "main": "bundles/okta-vue.umd.js",
   "files": [
     "dist",
     "src"
