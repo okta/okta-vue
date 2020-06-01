@@ -1,145 +1,334 @@
-# okta-oidc-js
-This is a monorepo that contains Okta's OpenID Connect JavaScript resources.
+[Okta Auth SDK]: https://github.com/okta/okta-auth-js
+[vue-router]: https://router.vuejs.org/en/essentials/getting-started.html
+[Vue prototype]: https://vuejs.org/v2/cookbook/adding-instance-properties.html
+[Auth service]: #$auth
 
-[![build status](https://img.shields.io/travis/okta/okta-oidc-js/master.svg?style=flat-square)](https://travis-ci.org/okta/okta-oidc-js)
+# Okta Vue SDK
 
-**Table of Contents**
+[![npm version](https://img.shields.io/npm/v/@okta/okta-vue.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-vue)
+[![build status](https://img.shields.io/travis/okta/okta-oidc-js/master.svg?style=flat-square)](https://travis-ci.org/okta/okta-vue)
 
-- [Getting Started](#getting-started)
-- [Packages](#packages)
-  - [Monorepo](#monorepo)
-  - [Versioning](#versioning)
-  - [Public packages](#public-packages)
-- [Configuration Reference](#configuration-reference)
-- [Testing](#testing)
-  - [Prerequisites](#prerequisites)
-    - [Create a SPA](#create-a-spa)
-    - [Create a Web App](#create-a-web-app)
-  - [Test an individual package](#test-an-individual-package)
-  - [Test all packages](#test-all-packages)
-- [Contributing](#contributing)
+Okta Vue SDK builds on top of the [Okta Auth SDK][]. This SDK integrates with the [vue-router][] and extends the [Vue prototype][] with an [Auth service][] to help you quickly add authentication and authorization to your Vue single-page web application.
+
+With the [Okta Auth SDK][], you can:
+
+- Login and logout from Okta using the [OAuth 2.0 API](https://developer.okta.com/docs/api/resources/oidc)
+- Retrieve user information
+- Determine authentication status
+- Validate the current user's session
+
+All of these features are supported by this SDK. Additionally, using this SDK, you can:
+
+- Add "protected" routes, which will require authentication before render
+- Provide an instance of the [Auth service][] to your components on the [Vue prototype][]
+
+> This SDK does not provide any UI components.
+
+> This SDK does not currently support Server Side Rendering (SSR)
+
+This library currently supports:
+
+- [OAuth 2.0 Implicit Flow](https://tools.ietf.org/html/rfc6749#section-1.3.2)
+- [OAuth 2.0 Authorization Code Flow](https://tools.ietf.org/html/rfc6749#section-1.3.1) with [Proof Key for Code Exchange (PKCE)](https://tools.ietf.org/html/rfc7636) 
 
 ## Getting Started
 
-We use Yarn as our node package manager during package development. To install Yarn, check out their [install documentation](https://yarnpkg.com/en/docs/install).
+- If you do not already have a **Developer Edition Account**, you can create one at [https://developer.okta.com/signup/](https://developer.okta.com/signup/).
+- An Okta Application, configured for Single-Page App (SPA) mode. This is done from the Okta Developer Console and you can find instructions [here](https://developer.okta.com/authentication-guide/implementing-authentication/implicit#1-setting-up-your-application). When following the wizard, use the default properties. They are are designed to work with our sample applications.
+
+### Helpful Links
+
+- [Vue CLI](https://github.com/vuejs/vue-cli)
+  - If you don't have a Vue app, or are new to Vue, please start with this guide. It will walk you through the creation of a Vue app, creating [routers](https://router.vuejs.org/en/essentials/getting-started.html), and other application development essentials.
+- [Okta Sample Application](https://github.com/okta/samples-js-vue)
+  - A fully functional sample application.
+- [Okta Guide: Sign users into your single-page application](https://developer.okta.com/docs/guides/sign-into-spa/vue/before-you-begin/)
+  - Step-by-step guide to integrating an existing Vue application with Okta login.
+
+## Installation
+
+This library is available through [npm](https://www.npmjs.com/package/@okta/okta-vue). To install it, simply add it to your project:
 
 ```bash
-# Clone the repo and navigate to it
-git clone git@github.com:okta/okta-oidc-js.git
-cd okta-oidc-js
-
-# Install dependencies
-yarn install
+npm install --save @okta/okta-vue
 ```
 
-## Packages
+### Configuration
 
-### Monorepo
+You will need the values from the OIDC client that you created in the previous step to instantiate the middleware. You will also need to know your Okta Org URL, which you can see on the home page of the Okta Developer console.
 
-The okta-oidc-js repo is managed as a **monorepo** using [Lerna](https://lernajs.io/). Each package within the **monorepo** is a separate npm module, each with its own `package.json` and `node_modules` directory.
+In your application's [vue-router](https://router.vuejs.org/en/essentials/getting-started.html) configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information:
 
-Packages are parsed from the `packages` property in [lerna.json](lerna.json), and adhere to this structure:
+```typescript
+// router/index.js
 
-```bash
-packages/
-  configuration-validation
-  jwt-verifier
-  oidc-middleware
-  okta-angular
-  okta-react
-  okta-react-native
-  okta-vue
+import Auth from '@okta/okta-vue'
+
+Vue.use(Auth, {
+  issuer: 'https://{yourOktaDomain}.com/oauth2/default',
+  clientId: '{clientId}',
+  redirectUri: 'http://localhost:{port}/implicit/callback',
+  scopes: ['openid', 'profile', 'email'],
+  pkce: true
+})
+
 ```
 
-### Versioning
+### Use the Callback Handler
 
-We've configured Lerna with [independent mode](https://github.com/lerna/lerna/#independent-mode---independent), which means that each package is required to manage its own version number.
+In order to handle the redirect back from Okta, you need to capture the token values from the URL. You'll use `/implicit/callback` as the callback URL, and use the default `Auth.handleCallback()` component included.
 
-### Public packages
+```typescript
+// router/index.js
 
-| Package                                                            | Status                                                                                                                                                            | Description                                                                                   |
-|--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| [**configuration-validation**](/packages/configuration-validation) | [![npm version](https://img.shields.io/npm/v/@okta/configuration-validation.svg?style=flat-square)](https://www.npmjs.com/package/@okta/configuration-validation) | Standard pattern for validating configuration passed into Okta JavaScript libraries and SDKs. |
-| [**jwt-verifier**](/packages/jwt-verifier)                         | [![npm version](https://img.shields.io/npm/v/@okta/jwt-verifier.svg?style=flat-square)](https://www.npmjs.com/package/@okta/jwt-verifier)                         | Easily verify JWTs from Okta                                                                  |
-| [**okta-angular**](/packages/okta-angular)                         | [![npm version](https://img.shields.io/npm/v/@okta/okta-angular.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-angular)                         | Angular support for Okta                                                                      |
-| [**oidc-middleware**](/packages/oidc-middleware)                   | [![npm version](https://img.shields.io/npm/v/@okta/oidc-middleware.svg?style=flat-square)](https://www.npmjs.com/package/@okta/oidc-middleware)                   | Middleware to easily add OpenID Connect to the Node.js framework of your choice               |
-| [**okta-react**](/packages/okta-react)                             | [![npm version](https://img.shields.io/npm/v/@okta/okta-react.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-react)                             | React support for Okta                                                                        |
-| [**okta-react-native**](/packages/okta-react-native)               | [![npm version](https://img.shields.io/npm/v/@okta/okta-react-native.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-react-native)               | React Native support for Okta                                                                 |
-| [**okta-vue**](/packages/okta-vue)                                 | [![npm version](https://img.shields.io/npm/v/@okta/okta-vue.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-vue)                                 | Vue.js support for Okta                                                                       |
-
-## Configuration Reference
-
-Each package is configured to look for environment variables based on the application type.
-
-```bash
-# Navigate into a specific package
-cd packages/${packageName}
-
-# Set the following environment variables
-#
-# ISSUER        - your authorization server
-# CLIENT_ID     - the client ID of your app
-# CLIENT_SECRET - the client secret of your app, required for the oidc-middleware package
-# USERNAME      - username of app user, required for tests
-# PASSWORD      - password of app user, required for tests
-export ISSUER=https://{yourOktaDomain}/oauth2/default
-...
+const router = new Router({
+  ...
+  mode: 'history',
+  routes: [
+    { path: '/implicit/callback', component: Auth.handleCallback() },
+    ...
+  ]
+})
 ```
 
-## Testing
+### Add a Protected Route
 
-Since the workspace contains libraries for Single-Page and Web Applications, you will need to have created a SPA and Web App in your Okta org.
+Routes are protected by the `authRedirectGuard`, which verifies there is a valid `accessToken` or `idToken` stored. To ensure the user has been authenticated before accessing your route, add the `requiresAuth` metadata:
 
-### Prerequisites
+```typescript
+// router/index.js
 
-#### Create a SPA
-
-1. Applications > Add Application
-2. Select SPA
-3. Add the following **login redirect URI**:
-    - `http://localhost:8080/implicit/callback`
-    - `http://localhost:8080/pkce/callback`
-4. Click Done
-5. Users > Add Person
-6. Create and activate user
-
-#### Create a Web App
-
-1. Applications > Add Application
-2. Select Web
-3. Add the following **login redirect URI**:
-    - `http://localhost:8080/authorization-code/callback`
-4. Click Done
-5. Users > Add Person
-6. Create and activate user
-
-### Test an individual package
-
-```bash
-# Navigate into a specific package
-cd packages/${packageName}
-
-# Run the test suite
-yarn test
+{
+  path: '/protected',
+  component: Protected,
+  meta: {
+    requiresAuth: true
+  }
+}
 ```
 
-### Test all packages
+Next, overload your router's `beforeEach()` executer to inject the global [navigation guard](https://router.vuejs.org/en/advanced/navigation-guards.html):
 
-Define the following environment variables at the project root and run the tests:
+```typescript
+// router/index.js
 
-```bash
-# Perform exports at the root of the repository
-[okta-oidc-js]$ export ISSUER=https://{yourOktaDomain}/oauth2/default
-[okta-oidc-js]$ export SPA_CLIENT_ID={SPAClientID}
-[okta-oidc-js]$ export WEB_CLIENT_ID={webAppClientID}
-[okta-oidc-js]$ export CLIENT_SECRET={webAppClientSecret}
-[okta-oidc-js]$ export USERNAME={username}
-[okta-oidc-js]$ export PASSWORD={password}
-
-# Run all tests
-[okta-oidc-js]$ yarn test
+router.beforeEach(Vue.prototype.$auth.authRedirectGuard())
 ```
+
+If a user does not have a valid session, they will be redirected to the Okta Login Page for authentication. Once authenticated, they will be redirected back to your application's **protected** page.
+
+### Show Login and Logout Buttons
+
+In the relevant location in your application, you will want to provide `Login` and `Logout` buttons for the user. You can show/hide the correct button by using the `$auth.isAuthenticated()` method. For example:
+
+```typescript
+// src/App.vue
+
+<template>
+  <div id="app">
+    <router-link to="/" tag="button" id='home-button'> Home </router-link>
+    <button v-if='authenticated' v-on:click='logout' id='logout-button'> Logout </button>
+    <button v-else v-on:click='$auth.loginRedirect' id='login-button'> Login </button>
+    <router-view/>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'app',
+  data: function () {
+    return {
+      authenticated: false
+    }
+  },
+  created () {
+    this.isAuthenticated()
+  },
+  watch: {
+    // Everytime the route changes, check for auth status
+    '$route': 'isAuthenticated'
+  },
+  methods: {
+    async isAuthenticated () {
+      this.authenticated = await this.$auth.isAuthenticated()
+    },
+    async logout () {
+      await this.$auth.logout()
+      await this.isAuthenticated()
+
+      // Navigate back to home
+      this.$router.push({ path: '/' })
+    }
+  }
+}
+</script>
+```
+
+### Use the Access Token
+
+When your users are authenticated, your Vue application has an access token that was issued by your Okta Authorization server. You can use this token to authenticate requests for resources on your server or API. As a hypothetical example, let's say you have an API that provides messages for a user. You could create a `MessageList` component that gets the access token and uses it to make an authenticated request to your server.
+
+Here is what the Vue component could look like for this hypothentical example using [axios](https://github.com/axios/axios):
+
+```typescript
+// src/components/MessageList.vue
+
+<template>
+  <ul v-if="posts && posts.length">
+    <li v-for="post in posts" :key='post.title'>
+      <p><strong>{{post.title}}</strong></p>
+      <p>{{post.body}}</p>
+    </li>
+  </ul>
+</template>
+
+<script>
+import axios from 'axios'
+
+export default {
+  data () {
+    return {
+      posts: []
+    }
+  },
+  async created () {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${await this.$auth.getAccessToken()}`
+    try {
+      const response = await axios.get(`http://localhost:{serverPort}/api/messages`)
+      this.posts = response.data
+    } catch (e) {
+      console.error(`Errors! ${e}`)
+    }
+  }
+}
+</script>
+```
+
+### Using a custom login-page
+
+The `okta-vue` SDK supports the session token redirect flow for custom login pages. For more information, [see the basic Okta Sign-in Widget functionality](https://github.com/okta/okta-signin-widget#new-oktasigninconfig).
+
+To handle the session-token redirect flow, you can create your own navigation guard using the `requiresAuth` meta param:
+
+```typescript
+// router/index.js
+
+router.beforeEach((to, from, next) {
+  if (to.matched.some(record => record.meta.requiresAuth) && !(await Vue.prototype.$auth.isAuthenticated())) {
+    // Navigate to custom login page
+    next({ path: '/login' })
+  } else {
+    next()
+  }
+})
+```
+
+## Reference
+
+### `$auth`
+
+`$auth` is the top-most component of okta-vue. This is where most of the configuration is provided.
+
+#### Configuration Options
+
+The most commonly used options are shown here. See [Configuration Reference](https://github.com/okta/okta-auth-js#configuration-reference) for an extended set of supported options.
+
+- `issuer` **(required)**: The OpenID Connect `issuer`
+- `clientId` **(required)**: The OpenID Connect `client_id`
+- `redirectUri` **(required)**: Where the callback is hosted
+- `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [logout](#authlogouturi). This url must be added to the list of `Logout redirect URIs` on the application's `General Settings` tab.
+- `scopes` *(optional)*: Reserved or custom claims to be returned in the tokens. Defaults to `['openid', 'email', 'profile']`. For a list of scopes and claims, please see [Scope-dependent claims](https://developer.okta.com/standards/OIDC/index.html#scope-dependent-claims-not-always-returned) for more information.
+- `responseType` *(optional)*: Desired token grant types. Default: `['id_token', 'token']`. For PKCE flow, this should be left undefined or set to `['code']`.
+- `pkce` *(optional)* - If `true`, Authorization Code w/PKCE flow will be used.  Defaults to `true`
+- `onAuthRequired` *(optional)*: - callback function. Called when authentication is required. If not supplied, `okta-vue` will redirect directly to Okta for authentication. This is triggered when:
+    1. [login](#authloginfromuri-additionalparams) is called
+    2. A route protected by `$auth.authRedirectGuard` is accessed without authentication
+- `onSessionExpired` *(optional)* - callback function. Called when the Okta SSO session has expired or was ended outside of the application. This SDK adds a default handler which will call [login](#authloginfromuri-additionalparams) to initiate a login flow. Passing a function here will disable the default handler.
+- `isAuthenticated` *(optional)* - callback function. By default, [$auth.isAuthenticated](#authisauthenticated) will return true if both `getIdToken()` and `getAccessToken()` return a value. Setting a `isAuthenticated` function on the config will skip the default logic and call the supplied function instead. The function should return a Promise and resolve to either true or false.
+- `tokenManager` *(optional)*: An object containing additional properties used to configure the internal token manager. See [AuthJS TokenManager](https://github.com/okta/okta-auth-js#the-tokenmanager) for more detailed information.
+  - `autoRenew` *(optional)*:
+  By default, the library will attempt to renew expired tokens. When an expired token is requested by the library, a renewal request is executed to update the token. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
+  - `secure`: If `true` then only "secure" https cookies will be stored. This option will prevent cookies from being stored on an HTTP connection. This option is only relevant if `storage` is set to `cookie`, or if the client browser does not support `localStorage` or `sessionStorage`, in which case `cookie` storage will be used.
+  - `storage` *(optional)*:
+    Specify the type of storage for tokens.
+    The types are:
+    - [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
+    - [`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
+    - [`cookie`](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
+
+#### `oktaAuth.login(fromUri?, additionalParams?)`
+
+Calls `onAuthRequired` function if it was set on the initial configuration. Otherwise, it will call `$auth.loginRedirect`. This method accepts a `fromUri` parameter to push the user to after successful authentication, and an optional `additionalParams` object.
+
+For more information on `additionalParams`, see the [oktaAuth.loginRedirect](#authloginredirectfromuri-additionalparams) method below.
+
+#### `$auth.loginRedirect(fromUri, additionalParams)`
+
+Performs a full page redirect to Okta based on the initial configuration. This method accepts a `fromUri` parameter to push the user to after successful authentication.
+
+The parameter `additionalParams` is mapped to the [AuthJS OpenID Connect Options](https://github.com/okta/okta-auth-js#openid-connect-options). This will override any existing [configuration](#configuration). As an example, if you have an Okta `sessionToken`, you can bypass the full-page redirect by passing in this token. This is recommended when using the [Okta Sign-In Widget](https://github.com/okta/okta-signin-widget). Simply pass in a `sessionToken` into the `loginRedirect` method follows:
+
+```typescript
+this.$auth.loginRedirect('/profile', {
+  sessionToken: /* sessionToken */
+})
+```
+
+> Note: For information on obtaining a `sessionToken` using the [Okta Sign-In Widget](https://github.com/okta/okta-signin-widget), please see the [`renderEl()` example](https://github.com/okta/okta-signin-widget#rendereloptions-success-error).
+
+#### `$auth.isAuthenticated`
+
+Returns `true` if there is a valid access token or ID token.
+
+#### `$auth.getAccessToken`
+
+Returns the access token from storage (if it exists).
+
+#### `$auth.getIdToken`
+
+Returns the ID token from storage (if it exists).
+
+#### `$auth.getUser`
+
+Returns the result of the OpenID Connect `/userinfo` endpoint if an access token exists.
+
+#### `$auth.handleAuthentication`
+
+Parses the tokens returned as hash fragments in the OAuth 2.0 Redirect URI.
+
+#### `$auth.setFromUri(uri, queryParams)`
+
+Store the current URL state before a redirect occurs.
+
+#### `$auth.getFromUri()`
+
+Returns the stored URI and query parameters stored by `setFromUri`
+
+#### `$auth.getTokenManager`
+
+Returns the internal [TokenManager](https://github.com/okta/okta-auth-js#tokenmanager).
+
+#### `$auth.logout(uri?)`
+
+Terminates the user's session in Okta and clears all stored tokens. Accepts an optional `uri` parameter to push the user to after logout.
 
 ## Contributing
 
-We're happy to accept contributions and PRs! Please see the [contribution guide](/CONTRIBUTING.md) to understand how to structure a contribution.
+We welcome contributions to all of our open-source packages. Please see the [contribution guide](https://github.com/okta/okta-oidc-js/blob/master/CONTRIBUTING.md) to understand how to structure a contribution.
+
+### Installing dependencies for contributions
+
+We use [yarn](https://yarnpkg.com) for dependency management when developing this package:
+
+```bash
+yarn install
+```
+
+### Commands
+
+| Command        | Description                        |
+| -------------- | ---------------------------------- |
+| `yarn install` | Install all dependencies           |
+| `yarn start`   | Start the sample app using the SDK |
+| `yarn test`    | Run integration tests              |
+| `yarn lint`    | Run eslint linting tests           |

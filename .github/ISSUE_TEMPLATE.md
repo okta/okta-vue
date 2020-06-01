@@ -4,15 +4,6 @@ Please help us process GitHub Issues faster by providing the following informati
 Note: If you have a question, please post it on the Okta Developer Forum (https://devforum.okta.com) instead. Issues in this repository are reserved for bug reports and feature requests.
 -->
 
-## I'm submitting this issue for the package(s):
-
-- [ ] jwt-verifier
-- [ ] okta-angular
-- [ ] oidc-middleware
-- [ ] okta-react
-- [ ] okta-react-native
-- [ ] okta-vue
-
 ## I'm submitting a:
 
 - [ ] Bug report  <!-- Please search GitHub for a similar issue or PR before submitting -->
@@ -30,7 +21,7 @@ Note: If you have a question, please post it on the Okta Developer Forum (https:
 ## Minimal reproduction of the problem with instructions
 <!--
 For bug reports please provide the *STEPS TO REPRODUCE* and if possible a *MINIMAL DEMO* of the problem.
-You could use one of our sample applications to build a reproduction demo: https://github.com/okta?q=samples-js
+You could use one of our sample applications to build a reproduction demo: https://github.com/okta/samples-js-vue/
 -->
 
 ## Extra information about the use case/user story you are trying to implement
@@ -39,7 +30,8 @@ You could use one of our sample applications to build a reproduction demo: https
 
 ## Environment
 
-- Package Version:
+- Package version:
+- Vue version:
 - Browser:
 - OS:
 - Node version (`node -v`):
