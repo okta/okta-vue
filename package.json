@@ -9,6 +9,7 @@
     "src"
   ],
   "scripts": {
+    "banners": "util/maintain-banners.js",
     "build": "node build.js",
     "lint": "eslint --ext .js,.vue .",
     "prepare": "yarn build",
