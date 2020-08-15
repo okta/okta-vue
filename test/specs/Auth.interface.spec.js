@@ -63,8 +63,7 @@ describe('Auth constructor', () => {
     createAuth()
     expect(AuthJS).toHaveBeenCalledWith(Object.assign({}, baseConfig, {
       scopes: ['openid', 'email', 'profile'],
-      responseType: ['id_token', 'token'],
-      onSessionExpired: expect.any(Function)
+      responseType: ['id_token', 'token']
     }))
   })
 
@@ -74,8 +73,7 @@ describe('Auth constructor', () => {
     }))
     expect(AuthJS).toHaveBeenCalledWith(Object.assign({}, baseConfig, {
       scopes: ['openid', 'email', 'profile'],
-      responseType: ['fake'],
-      onSessionExpired: expect.any(Function)
+      responseType: ['fake']
     }))
   })
 
@@ -86,20 +84,17 @@ describe('Auth constructor', () => {
     }))
     expect(AuthJS).toHaveBeenCalledWith(Object.assign({}, baseConfig, {
       scopes: ['openid', 'a'],
-      responseType: ['fake'],
-      onSessionExpired: expect.any(Function)
+      responseType: ['fake']
     }))
   })
 })
 
 describe('onSessionExpired', () => {
-  it('By default, sets a handler for "onSessionExpired" which calls login()', () => {
+  it('By default, handler for "onSessionExpired" is undefined', () => {
     jest.spyOn(Auth.prototype, 'login').mockReturnValue(undefined)
     const auth = createAuth()
     const config = auth.config
-    expect(config.onSessionExpired).toBeDefined()
-    config.onSessionExpired()
-    expect(Auth.prototype.login).toHaveBeenCalled()
+    expect(config.onSessionExpired).toBeUndefined()
   })
 
   it('Accepts custom function "onSessionExpired" via config which disables default handler', () => {

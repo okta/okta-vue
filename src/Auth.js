@@ -21,13 +21,6 @@ const packageInfo = PACKAGE
 export default class Auth {
   constructor (config) {
     this.config = initConfig(config)
-
-    // Automatically enter login flow if session has expired or was ended outside the application
-    // The default behavior can be overriden by passing your own function via config: `config.onSessionExpired`
-    if (!this.config.onSessionExpired) {
-      this.config.onSessionExpired = this.login.bind(this)
-    }
-
     this.oktaAuth = new AuthJS(this.config)
     this.oktaAuth.userAgent = `${packageInfo.name}/${packageInfo.version} ${this.oktaAuth.userAgent}`
   }
