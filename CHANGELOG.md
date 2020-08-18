@@ -1,3 +1,14 @@
+# 2.1.0
+
+### Bug Fixes
+
+- [#17](https://github.com/okta/okta-vue/pull/17) Removes default `onSessionExpired` behavior.
+
+### Other
+
+- Updates `@okta/okta-auth-js` to version 3.2.3
+- Updates README with more information about `onSessionExpired` and `isAuthenticated` options
+
 # 2.0.0
 
 ### Breaking Changes

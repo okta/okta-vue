@@ -67,16 +67,15 @@ import Auth from '@okta/okta-vue'
 Vue.use(Auth, {
   issuer: 'https://{yourOktaDomain}.com/oauth2/default',
   clientId: '{clientId}',
-  redirectUri: 'http://localhost:{port}/implicit/callback',
-  scopes: ['openid', 'profile', 'email'],
-  pkce: true
+  redirectUri: window.location.origin + '/implicit/callback',
+  scopes: ['openid', 'profile', 'email']
 })
 
 ```
 
 ### Use the Callback Handler
 
-In order to handle the redirect back from Okta, you need to capture the token values from the URL. You'll use `/implicit/callback` as the callback URL, and use the default `Auth.handleCallback()` component included.
+In order to handle the redirect back from Okta, you need to capture the token values from the URL. In this example, `/implicit/callback` is used as the login redirect URI and `Auth.handleCallback()` component is used to obtain tokens. You can [customize the callback route](https://developer.okta.com/docs/guides/sign-into-spa/vue/define-callback/) or provide your own component by copying the [ImplicitCallback component](https://github.com/okta/okta-vue/blob/master/src/components/ImplicitCallback.vue) to your own source tree and modifying as needed.
 
 ```typescript
 // router/index.js
@@ -93,7 +92,7 @@ const router = new Router({
 
 ### Add a Protected Route
 
-Routes are protected by the `authRedirectGuard`, which verifies there is a valid `accessToken` or `idToken` stored. To ensure the user has been authenticated before accessing your route, add the `requiresAuth` metadata:
+Routes are protected by the `authRedirectGuard`, which allows access only if `isAuthenticated` returns true. By default, this method returns true if there is a valid `accessToken` **or** valid `idToken` stored, but this behavior [can be customized](#configuration-options) by defining a custom `isAuthenticated` function. To protect a route using the guard, add the `requiresAuth` metadata:
 
 ```typescript
 // router/index.js
@@ -236,15 +235,31 @@ The most commonly used options are shown here. See [Configuration Reference](htt
 - `issuer` **(required)**: The OpenID Connect `issuer`
 - `clientId` **(required)**: The OpenID Connect `client_id`
 - `redirectUri` **(required)**: Where the callback is hosted
-- `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [logout](#authlogouturi). This url must be added to the list of `Logout redirect URIs` on the application's `General Settings` tab.
+- `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [logout](#authlogouturi). If not sepecified, this will be `window.location.origin`. This url must be added to the list of `Logout redirect URIs` on the application's `General Settings` tab.
 - `scopes` *(optional)*: Reserved or custom claims to be returned in the tokens. Defaults to `['openid', 'email', 'profile']`. For a list of scopes and claims, please see [Scope-dependent claims](https://developer.okta.com/standards/OIDC/index.html#scope-dependent-claims-not-always-returned) for more information.
 - `responseType` *(optional)*: Desired token grant types. Default: `['id_token', 'token']`. For PKCE flow, this should be left undefined or set to `['code']`.
-- `pkce` *(optional)* - If `true`, Authorization Code w/PKCE flow will be used.  Defaults to `true`
+- `pkce` *(optional)* - If `true`, Authorization Code w/PKCE flow will be used.  Defaults to `true`. If `false`, Implicit OIDC flow will be used.
 - `onAuthRequired` *(optional)*: - callback function. Called when authentication is required. If not supplied, `okta-vue` will redirect directly to Okta for authentication. This is triggered when:
     1. [login](#authloginfromuri-additionalparams) is called
     2. A route protected by `$auth.authRedirectGuard` is accessed without authentication
-- `onSessionExpired` *(optional)* - callback function. Called when the Okta SSO session has expired or was ended outside of the application. This SDK adds a default handler which will call [login](#authloginfromuri-additionalparams) to initiate a login flow. Passing a function here will disable the default handler.
-- `isAuthenticated` *(optional)* - callback function. By default, [$auth.isAuthenticated](#authisauthenticated) will return true if both `getIdToken()` and `getAccessToken()` return a value. Setting a `isAuthenticated` function on the config will skip the default logic and call the supplied function instead. The function should return a Promise and resolve to either true or false.
+- `onSessionExpired` **deprecated** (*(optional)* - callback function. Called on token renew failure.
+:warning: This option will be removed in an upcoming version. When a [token renew](#tokenrenewtokentorenew) fails, an "error" event will be fired from the [TokenManager](#tokenmanageronevent-callback-context) and the token will be [removed from storage](#tokenmanagergetkey). Presense of a token in storage can be used to determine if a login flow is needed in the `isAuthenticated` method. Take care when beginning a new login flow that there is not another login flow already in progress. Be careful not to initiate the token renew process in this callback, explicitly with `tokenManager.renew()` or implicitly with `tokenManager.get()`, as your app may end up in an infinite loop.
+- `isAuthenticated` *(optional)* - callback function. By default, [$auth.isAuthenticated](#authisauthenticated) will return true if **either** `getIdToken()` or `getAccessToken()` return a value. Setting a `isAuthenticated` function on the config will skip the default logic and call the supplied function instead. The function should return a Promise and resolve to either true or false.
+  **NOTE** The default behavior of this callback will be changed in the next major release to resolve to true when **both** `getIdToken()` and `getAccessToken()` return a value. Currently, you can achieve this behavior as shown:
+  
+  ```javascript
+  import Auth from '@okta/okta-vue'
+
+  Vue.use(Auth, {
+    // ...other configs
+    isAuthenticated: async () => {
+      const idToken = await Vue.prototype.$auth.getIdToken();
+      const accessToken = await Vue.prototype.$auth.getAccessToken();
+      return !!(idToken && accessToken);
+    }
+  })
+  ```
+
 - `tokenManager` *(optional)*: An object containing additional properties used to configure the internal token manager. See [AuthJS TokenManager](https://github.com/okta/okta-auth-js#the-tokenmanager) for more detailed information.
   - `autoRenew` *(optional)*:
   By default, the library will attempt to renew expired tokens. When an expired token is requested by the library, a renewal request is executed to update the token. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
@@ -278,7 +293,7 @@ this.$auth.loginRedirect('/profile', {
 
 #### `$auth.isAuthenticated`
 
-Returns `true` if there is a valid access token or ID token.
+If an `isAuthenticated` function was set on the configuration object, this method will await and return the result from the provided function. Otherwise, it will return `true` if there is either a valid access token **or** an ID token.
 
 #### `$auth.getAccessToken`
 
