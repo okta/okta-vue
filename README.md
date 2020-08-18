@@ -293,7 +293,7 @@ this.$auth.loginRedirect('/profile', {
 
 #### `$auth.isAuthenticated`
 
-If an `isAuthenticated` function was set on the configuration object, this method will await and return the result from the provided function. Otherwise, it will return `true` if there is either a valid access token or ID token.
+If an `isAuthenticated` function was set on the configuration object, this method will await and return the result from the provided function. Otherwise, it will return `true` if there is either a valid access token **or** an ID token.
 
 #### `$auth.getAccessToken`
 
