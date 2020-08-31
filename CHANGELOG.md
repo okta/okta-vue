@@ -1,3 +1,9 @@
+# 2.1.1
+
+### Bug Fixes
+
+- [#21](https://github.com/okta/okta-vue/pull/21) Includes source map in release bundle
+
 # 2.1.0
 
 ### Bug Fixes
