@@ -5,7 +5,7 @@
   "description": "Vue support for Okta",
   "main": "bundles/okta-vue.umd.js",
   "files": [
-    "dist",
+    "bundles",
     "src"
   ],
   "scripts": {
