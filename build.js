@@ -26,7 +26,13 @@ shell.cp(`-Rf`, [`src`, `package.json`, `LICENSE`, `THIRD-PARTY-NOTICES`, `*.md`
 shell.echo(`Modifying final package.json`)
 let packageJSON = JSON.parse(fs.readFileSync(`./${NPM_DIR}/package.json`))
 packageJSON.private = false
-packageJSON.scripts.prepare = ''
+packageJSON.scripts.prepare = '';
+
+// Remove "dist/" from the entrypoint paths.
+['main'].forEach(function (key) {
+  packageJSON[key] = packageJSON[key].replace('dist/', '')
+})
+
 fs.writeFileSync(`./${NPM_DIR}/package.json`, JSON.stringify(packageJSON, null, 4))
 
 shell.echo(chalk.green(`End building`))
