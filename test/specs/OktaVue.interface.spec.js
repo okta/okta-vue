@@ -11,11 +11,9 @@
  */
 
 import { createLocalVue } from '@vue/test-utils'
-import { default as OktaVue } from '../../src/okta-vue'
-import Auth from '../../src/Auth'
-import ImplicitCallback from '../../src/components/ImplicitCallback'
-
-jest.mock('@okta/okta-auth-js')
+import { OktaAuth } from '@okta/okta-auth-js'
+import OktaVue, { LoginCallback } from '../../src/okta-vue'
+import InternalLoginCallback from '../../src/components/LoginCallback'
 
 const baseConfig = {
   issuer: 'https://foo',
@@ -28,12 +26,12 @@ describe('OktaVue module', () => {
     expect(OktaVue.install).toBeTruthy()
   })
   test('Sets an instance of Auth on Vue prototype', () => {
+    const oktaAuth = new OktaAuth(baseConfig)
     const localVue = createLocalVue()
-    localVue.use(OktaVue, baseConfig)
-    expect(localVue.prototype.$auth instanceof Auth).toBeTruthy()
+    localVue.use(OktaVue, { oktaAuth })
+    expect(localVue.prototype.$auth instanceof OktaAuth).toBeTruthy()
   })
-  test('handleCallback() returns ImplicitCallback component', () => {
-    expect(typeof OktaVue.handleCallback).toBe('function')
-    expect(OktaVue.handleCallback()).toBe(ImplicitCallback)
+  test('Exports "LoginCallback" component', () => {
+    expect(LoginCallback).toBe(InternalLoginCallback)
   })
 })

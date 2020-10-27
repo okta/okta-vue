@@ -12,12 +12,9 @@
 
 <script>
 export default {
-  name: 'ImplicitCallback',
+  name: 'LoginCallback',
   async beforeMount () {
-    await this.$auth.handleAuthentication()
-    this.$router.replace({
-      path: this.$auth.getFromUri()
-    })
+    await this.$auth.handleLoginRedirect()
   },
   render () {}
 }

@@ -1,3 +1,20 @@
+[authState]: https://github.com/okta/okta-auth-js#authstatemanager
+
+# 3.0.0
+
+### Breaking Changes
+
+- [#27](https://github.com/okta/okta-vue/pull/27) See [MIGRATING](MIGRATING.md) for detailed information.
+  - Replaces `Auth` service with instance of [@okta/okta-auth-js](https://github.com/okta/okta-auth-js) for `$auth`, so all configuration options and public methods are available.
+  - By default `isAuthenticated` will be true if **both** accessToken **and** idToken are valid
+  - Replaces `Auth.handleCallback` with `LoginCallback` component
+
+### Features
+
+- [#27](https://github.com/okta/okta-vue/pull/27)
+  - Injects reactive [authState][] property to the Vue components
+  - Guards secure route by reacting to [authState.isAuthenticated][authState] change
+
 # 2.1.1
 
 ### Bug Fixes
