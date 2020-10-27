@@ -53,6 +53,12 @@ This library is available through [npm](https://www.npmjs.com/package/@okta/okta
 npm install --save @okta/okta-vue
 ```
 
+If you are using TypeScript, types are provided via:
+
+```bash
+npm install --save @types/okta__okta-vue
+```
+
 ### Configuration
 
 You will need the values from the OIDC client that you created in the previous step to instantiate the middleware. You will also need to know your Okta Org URL, which you can see on the home page of the Okta Developer console.
