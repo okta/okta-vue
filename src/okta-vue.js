@@ -10,14 +10,19 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import ImplicitCallback from './components/ImplicitCallback'
-import Auth from './Auth'
+ import Auth from './Auth'
 
 function install (Vue, options) {
   const auth = new Auth(options)
+  
+  // add extra options to auth.options
+  auth.options.onAuthRequired = options.onAuthRequired
+  auth.options.onPostLoginRedirect = options.onPostLoginRedirect
+
+  // add oktaAuth instance to Vue
   Vue.prototype.$auth = auth
 }
 
-function handleCallback () { return ImplicitCallback }
-
-export default { install, handleCallback }
+export default { install }
+export { default as ImplicitCallback } from './components/ImplicitCallback'
+export { default as Security } from './components/Security'
