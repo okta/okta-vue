@@ -323,9 +323,9 @@ Returns the stored URI and query parameters stored by `setFromUri`
 
 Returns the internal [TokenManager](https://github.com/okta/okta-auth-js#tokenmanager).
 
-#### `$auth.logout(uri?)`
+#### `$auth.logout(options?)`
 
-Terminates the user's session in Okta and clears all stored tokens. Accepts an optional `uri` parameter to push the user to after logout.
+Terminates the user's session in Okta and clears all stored tokens. Accepts an optional `options` parameter. Set `options.postLogoutRedirectUri` to set the uri to push the user to after logout.
 
 ## Contributing
 
