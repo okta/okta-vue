@@ -29,7 +29,8 @@ export default {
         password: this.password
       })
       .then(res =>
-        this.$auth.loginRedirect('/protected', {
+        this.$auth.signInWithRedirect({
+          originalUri: '/protected',
           sessionToken: res.sessionToken
         })
       )
