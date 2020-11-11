@@ -11,88 +11,105 @@
  */
 
 /* global PACKAGE */
-import { OktaAuth, toRelativeUrl } from '@okta/okta-auth-js'
+import { toRelativeUrl, AuthSdkError } from '@okta/okta-auth-js'
 
 // constants are defined in webpack.config.js
 const packageInfo = PACKAGE
 
-export const _handleLogin = async (oktaAuth, originalUri, onAuthRequired) => {
-  oktaAuth.setOriginalUri(originalUri)
-  if (onAuthRequired) {
-    await onAuthRequired()
-  } else {
-    await oktaAuth.signInWithRedirect()
+function install (Vue, {
+  oktaAuth,
+  onAuthRequired
+} = {}) {
+  if (!oktaAuth) {
+    throw AuthSdkError('No oktaAuth instance passed to OktaVue.')
   }
-}
-
-function install (Vue, { onAuthRequired, ...oktaAuthConfig } = {}) {
-  const auth = new OktaAuth(oktaAuthConfig)
 
   // customize user agent
-  auth.userAgent = `${packageInfo.name}/${packageInfo.version} ${this.userAgent}`
+  oktaAuth.userAgent = `${packageInfo.name}/${packageInfo.version} ${oktaAuth.userAgent}`
 
-  const guardSecureRoute = (authState) => {
-    if (!authState.isAuthenticated) {
-      _handleLogin(auth, originalUriTracker, onAuthRequired)
+  // add default restoreOriginalUri callback
+  let router
+  if (!oktaAuth.options.restoreOriginalUri) {
+    oktaAuth.options.restoreOriginalUri = async (_, originalUri) => {
+      // If a router is available, provide a default implementation
+      if (router) {
+        const path = toRelativeUrl(originalUri, window.location.origin)
+        return router.replace({ path })
+      }
     }
   }
 
   let originalUriTracker
+  const guardSecureRoute = async (authState) => {
+    if (!authState.isAuthenticated) {
+      oktaAuth.setOriginalUri(originalUriTracker)
+      if (onAuthRequired) {
+        await onAuthRequired(oktaAuth)
+      } else {
+        await oktaAuth.signInWithRedirect()
+      }
+    }
+  }
+
   Vue.mixin({
     data () {
       return {
-        authState: auth.authStateManager.getAuthState()
+        authState: oktaAuth.authStateManager.getAuthState()
       }
     },
     created () {
-      // add default restoreOriginalUri callback
-      if (!this.$auth.options.restoreOriginalUri && this.$router) {
-        auth.options.restoreOriginalUri = (_, originalUri) => {
-          this.$router.replace({
-            path: toRelativeUrl(originalUri, window.location.origin)
-          })
-        }
-      }
+      // assign router for the default restoreOriginalUri callback
+      router = this.$router
 
       // subscribe to the latest authState
-      auth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-      if (!auth.token.isLoginRedirect()) {
+      oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
+      if (!oktaAuth.token.isLoginRedirect()) {
         // trigger an initial change event to make sure authState is latest
-        auth.authStateManager.updateAuthState()
+        oktaAuth.authStateManager.updateAuthState()
       }
     },
     beforeDestroy () {
-      auth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
+      oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
     },
     // "beforeRouteEnter" does NOT have access to `this` component instance
     async beforeRouteEnter (to, _, next) {
-      const isAuthenticated = await auth.isAuthenticated()
-      if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-        // subscribe to authState change to protect secure routes after accessing
-        auth.authStateManager.subscribe(guardSecureRoute)
+      if (to.matched.some(record => record.meta.requiresAuth)) {
+        // track the originalUri for guardSecureRoute
         originalUriTracker = to.fullPath
-        await _handleLogin(auth, to.fullPath, onAuthRequired)
+
+        // subscribe to authState change to protect secure routes when authState change
+        // all secure routes should subscribe before enter the route
+        oktaAuth.authStateManager.subscribe(guardSecureRoute)
+
+        // guard the secure route based on the authState when enter
+        const isAuthenticated = await oktaAuth.isAuthenticated()
+        if (!isAuthenticated) {
+          const authState = oktaAuth.authStateManager.getAuthState()
+          await guardSecureRoute(authState)
+        } else {
+          next()
+        }
       } else {
         next()
       }
     },
     beforeRouteLeave (to, from, next) {
-      // unsubscribe authState update before leave route
-      auth.authStateManager.unsubscribe(guardSecureRoute)
+      oktaAuth.authStateManager.unsubscribe(guardSecureRoute)
       next()
     },
     // private property naming convention follows
     // https://vuejs.org/v2/style-guide/#Private-property-names-essential
     methods: {
-      $_oktaVue_handleAuthStateUpdate: async function (authState) {
+      async $_oktaVue_handleAuthStateUpdate (authState) {
         this.authState = Object.assign(this.authState, authState)
       }
     }
   })
 
   // add oktaAuth instance to Vue
-  Vue.prototype.$auth = auth
+  Vue.prototype.$auth = oktaAuth
 }
 
 export default { install }
+
 export { default as LoginCallback } from './components/LoginCallback'

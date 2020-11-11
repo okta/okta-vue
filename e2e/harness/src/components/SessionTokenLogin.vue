@@ -12,9 +12,6 @@
 </template>
 
 <script>
-/* global CONFIG */
-import OktaAuth from '@okta/okta-auth-js'
-
 export default {
   name: 'SessionTokenLogin',
   data () {
@@ -22,9 +19,7 @@ export default {
   },
   methods: {
     signIn () {
-      const authJS = new OktaAuth({ url: CONFIG.ISSUER.split('/oauth2/')[0] })
-
-      authJS.signIn({
+      this.$auth.signInWithCredentials({
         username: this.username,
         password: this.password
       })

@@ -1,14 +1,15 @@
 [Okta Auth SDK]: https://github.com/okta/okta-auth-js
+[authState]: https://github.com/okta/okta-auth-js#authstatemanager
 [vue-router]: https://router.vuejs.org/en/essentials/getting-started.html
 [Vue prototype]: https://vuejs.org/v2/cookbook/adding-instance-properties.html
-[Auth service]: #$auth
+[Vue Plugin]: https://vuejs.org/v2/guide/plugins.html
 
 # Okta Vue SDK
 
 [![npm version](https://img.shields.io/npm/v/@okta/okta-vue.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-vue)
 [![build status](https://img.shields.io/travis/okta/okta-oidc-js/master.svg?style=flat-square)](https://travis-ci.org/okta/okta-vue)
 
-Okta Vue SDK builds on top of the [Okta Auth SDK][]. This SDK integrates with the [vue-router][] and extends the [Vue prototype][] with an [Auth service][] to help you quickly add authentication and authorization to your Vue single-page web application.
+Okta Vue SDK builds on top of the [Okta Auth SDK][]. This SDK integrates with the [vue-router][] and extends the [Vue prototype][] with an [Okta Auth SDK][] instance to help you quickly add authentication and authorization to your Vue single-page web application.
 
 With the [Okta Auth SDK][], you can:
 
@@ -20,7 +21,8 @@ With the [Okta Auth SDK][], you can:
 All of these features are supported by this SDK. Additionally, using this SDK, you can:
 
 - Add "protected" routes, which will require authentication before render
-- Provide an instance of the [Auth service][] to your components on the [Vue prototype][]
+- Provide an instance of the [Okta Auth SDK][] to your components on the [Vue prototype][]
+- Inject reactive [authState][] property to your Vue components
 
 > This SDK does not provide any UI components.
 
@@ -57,34 +59,39 @@ npm install --save @okta/okta-vue
 
 You will need the values from the OIDC client that you created in the previous step to instantiate the middleware. You will also need to know your Okta Org URL, which you can see on the home page of the Okta Developer console.
 
-In your application's [vue-router](https://router.vuejs.org/en/essentials/getting-started.html) configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information:
+In your application's [vue-router][] configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information:
 
 ```typescript
 // router/index.js
 
-import Auth from '@okta/okta-vue'
+import { OktaAuth } from '@okta/okta-auth-js'
+import OktaVue from '@okta/okta-vue'
 
-Vue.use(Auth, {
+const oktaAuth = new OktaAuth({
   issuer: 'https://{yourOktaDomain}.com/oauth2/default',
   clientId: '{clientId}',
-  redirectUri: window.location.origin + '/implicit/callback',
+  redirectUri: window.location.origin + '/login/callback',
   scopes: ['openid', 'profile', 'email']
 })
+Vue.use(OktaVue, { oktaAuth })
 
 ```
 
-### Use the Callback Handler
+### Use the LoginCallback Component
 
-In order to handle the redirect back from Okta, you need to capture the token values from the URL. In this example, `/implicit/callback` is used as the login redirect URI and `Auth.handleCallback()` component is used to obtain tokens. You can [customize the callback route](https://developer.okta.com/docs/guides/sign-into-spa/vue/define-callback/) or provide your own component by copying the [ImplicitCallback component](https://github.com/okta/okta-vue/blob/master/src/components/ImplicitCallback.vue) to your own source tree and modifying as needed.
+In order to handle the redirect back from Okta, you need to capture the token values from the URL. In this example, `/login/callback` is used as the login redirect URI and [LoginCallback](#logincallback) component is used to obtain tokens. You can customize the callback route with the following example or provide your own component by copying the [LoginCallback component](https://github.com/okta/okta-vue/blob/master/src/components/LoginCallback.vue) to your own source tree and modifying as needed.
+
+**Note:** Make sure you have the `/login/callback` url (absolute url) added in your Okta App's configuration.
 
 ```typescript
 // router/index.js
+import { LoginCallback } from '@okta/okta-vue'
 
 const router = new Router({
   ...
   mode: 'history',
   routes: [
-    { path: '/implicit/callback', component: Auth.handleCallback() },
+    { path: '/login/callback', component: LoginCallback },
     ...
   ]
 })
@@ -92,7 +99,7 @@ const router = new Router({
 
 ### Add a Protected Route
 
-Routes are protected by the `authRedirectGuard`, which allows access only if `isAuthenticated` returns true. By default, this method returns true if there is a valid `accessToken` **or** valid `idToken` stored, but this behavior [can be customized](#configuration-options) by defining a custom `isAuthenticated` function. To protect a route using the guard, add the `requiresAuth` metadata:
+Route is protected when the `requiresAuth` metadata is added in the configuration, which allows access only if [authState.isAuthenticated][authState] is true. By default, [authState.isAuthenticated][authState] is true if **both** `accessToken` **and** `idToken` are valid, but this behavior can be customized by defining a custom [isAuthenticated](#isauthenticated) function.
 
 ```typescript
 // router/index.js
@@ -106,19 +113,11 @@ Routes are protected by the `authRedirectGuard`, which allows access only if `is
 }
 ```
 
-Next, overload your router's `beforeEach()` executer to inject the global [navigation guard](https://router.vuejs.org/en/advanced/navigation-guards.html):
-
-```typescript
-// router/index.js
-
-router.beforeEach(Vue.prototype.$auth.authRedirectGuard())
-```
-
-If a user does not have a valid session, they will be redirected to the Okta Login Page for authentication. Once authenticated, they will be redirected back to your application's **protected** page.
+If a user does not have a valid session, then a new authorization flow will begin. By default, they will be redirected to the Okta Login Page for authentication. Once authenticated, they will be redirected back to your application's protected page. This logic can be customized by setting an [onAuthRequired](#onauthrequired) function on the config object.
 
 ### Show Login and Logout Buttons
 
-In the relevant location in your application, you will want to provide `Login` and `Logout` buttons for the user. You can show/hide the correct button by using the `$auth.isAuthenticated()` method. For example:
+In the relevant location in your application, you will want to provide `Login` and `Logout` buttons for the user. You can show/hide the correct button by using the injected reactive [authState][] property. For example:
 
 ```typescript
 // src/App.vue
@@ -126,8 +125,8 @@ In the relevant location in your application, you will want to provide `Login` a
 <template>
   <div id="app">
     <router-link to="/" tag="button" id='home-button'> Home </router-link>
-    <button v-if='authenticated' v-on:click='logout' id='logout-button'> Logout </button>
-    <button v-else v-on:click='$auth.loginRedirect' id='login-button'> Login </button>
+    <button v-if='authState.isAuthenticated' v-on:click='logout' id='logout-button'> Logout </button>
+    <button v-else v-on:click='login' id='login-button'> Login </button>
     <router-view/>
   </div>
 </template>
@@ -135,28 +134,12 @@ In the relevant location in your application, you will want to provide `Login` a
 <script>
 export default {
   name: 'app',
-  data: function () {
-    return {
-      authenticated: false
-    }
-  },
-  created () {
-    this.isAuthenticated()
-  },
-  watch: {
-    // Everytime the route changes, check for auth status
-    '$route': 'isAuthenticated'
-  },
   methods: {
-    async isAuthenticated () {
-      this.authenticated = await this.$auth.isAuthenticated()
+    async login () {
+      await this.$auth.signInWithRedirect()
     },
     async logout () {
-      await this.$auth.logout()
-      await this.isAuthenticated()
-
-      // Navigate back to home
-      this.$router.push({ path: '/' })
+      await this.$auth.signOut()
     }
   }
 }
@@ -191,7 +174,7 @@ export default {
     }
   },
   async created () {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${await this.$auth.getAccessToken()}`
+    axios.defaults.headers.common['Authorization'] = `Bearer ${this.$auth.getAccessToken()}`
     try {
       const response = await axios.get(`http://localhost:{serverPort}/api/messages`)
       this.posts = response.data
@@ -207,125 +190,65 @@ export default {
 
 The `okta-vue` SDK supports the session token redirect flow for custom login pages. For more information, [see the basic Okta Sign-in Widget functionality](https://github.com/okta/okta-signin-widget#new-oktasigninconfig).
 
-To handle the session-token redirect flow, you can create your own navigation guard using the `requiresAuth` meta param:
+To implement a custom login page, set an [onAuthRequired](#onauthrequired) callback on the OktaConfig object:
 
 ```typescript
 // router/index.js
 
-router.beforeEach((to, from, next) {
-  if (to.matched.some(record => record.meta.requiresAuth) && !(await Vue.prototype.$auth.isAuthenticated())) {
-    // Navigate to custom login page
-    next({ path: '/login' })
-  } else {
-    next()
+import Vue from 'vue'
+import Router from 'vue-router'
+import OktaVue from '@okta/okta-vue'
+import { OktaAuth } from '@okta/okta-auth-js'
+
+const oktaAuth = new OktaAuth(/* config */)
+const router = new Router({
+  mode: 'history',
+  routes: [
+    // other routes ...
+    { path: '/login', component: Login }
+  ]
+})
+
+Vue.use(Router)
+Vue.use(OktaVue, {
+  oktaAuth
+  onAuthRequired: (oktaAuth) => {
+    router.push({ path: '/login' })
   }
 })
+
+export default router
 ```
 
 ## Reference
 
 ### `$auth`
 
-`$auth` is the top-most component of okta-vue. This is where most of the configuration is provided.
+This SDK works as a [Vue Plugin][]. It provides an instance of the [Okta Auth SDK][] to your components on the [Vue prototype][]. You can access the [Okta Auth SDK][] instance by using `this.$auth` in your components.
+
+### `LoginCallback`
+
+`LoginCallback` handles the callback after the redirect to and back from the Okta-hosted login page. By default, it parses the tokens from the uri, stores them, then redirects to `/`. If a secure route caused the redirect, then the callback redirects to the secured route. For more advanced cases, this component can be copied to your own source tree and modified as needed.
 
 #### Configuration Options
 
-The most commonly used options are shown here. See [Configuration Reference](https://github.com/okta/okta-auth-js#configuration-reference) for an extended set of supported options.
+The base set of configuration options are defined by [Okta Auth SDK][]. The following properties are required:
 
 - `issuer` **(required)**: The OpenID Connect `issuer`
 - `clientId` **(required)**: The OpenID Connect `client_id`
 - `redirectUri` **(required)**: Where the callback is hosted
-- `postLogoutRedirectUri` | Specify the url where the browser should be redirected after [logout](#authlogouturi). If not sepecified, this will be `window.location.origin`. This url must be added to the list of `Logout redirect URIs` on the application's `General Settings` tab.
-- `scopes` *(optional)*: Reserved or custom claims to be returned in the tokens. Defaults to `['openid', 'email', 'profile']`. For a list of scopes and claims, please see [Scope-dependent claims](https://developer.okta.com/standards/OIDC/index.html#scope-dependent-claims-not-always-returned) for more information.
-- `responseType` *(optional)*: Desired token grant types. Default: `['id_token', 'token']`. For PKCE flow, this should be left undefined or set to `['code']`.
-- `pkce` *(optional)* - If `true`, Authorization Code w/PKCE flow will be used.  Defaults to `true`. If `false`, Implicit OIDC flow will be used.
-- `onAuthRequired` *(optional)*: - callback function. Called when authentication is required. If not supplied, `okta-vue` will redirect directly to Okta for authentication. This is triggered when:
-    1. [login](#authloginfromuri-additionalparams) is called
-    2. A route protected by `$auth.authRedirectGuard` is accessed without authentication
-- `onSessionExpired` **deprecated** (*(optional)* - callback function. Called on token renew failure.
-:warning: This option will be removed in an upcoming version. When a [token renew](#tokenrenewtokentorenew) fails, an "error" event will be fired from the [TokenManager](#tokenmanageronevent-callback-context) and the token will be [removed from storage](#tokenmanagergetkey). Presense of a token in storage can be used to determine if a login flow is needed in the `isAuthenticated` method. Take care when beginning a new login flow that there is not another login flow already in progress. Be careful not to initiate the token renew process in this callback, explicitly with `tokenManager.renew()` or implicitly with `tokenManager.get()`, as your app may end up in an infinite loop.
-- `isAuthenticated` *(optional)* - callback function. By default, [$auth.isAuthenticated](#authisauthenticated) will return true if **either** `getIdToken()` or `getAccessToken()` return a value. Setting a `isAuthenticated` function on the config will skip the default logic and call the supplied function instead. The function should return a Promise and resolve to either true or false.
-  **NOTE** The default behavior of this callback will be changed in the next major release to resolve to true when **both** `getIdToken()` and `getAccessToken()` return a value. Currently, you can achieve this behavior as shown:
-  
-  ```javascript
-  import Auth from '@okta/okta-vue'
 
-  Vue.use(Auth, {
-    // ...other configs
-    isAuthenticated: async () => {
-      const idToken = await Vue.prototype.$auth.getIdToken();
-      const accessToken = await Vue.prototype.$auth.getAccessToken();
-      return !!(idToken && accessToken);
-    }
-  })
-  ```
+This SDK accepts all configuration options defined by [Okta Auth SDK][] (see [Configuration Reference](https://github.com/okta/okta-auth-js#configuration-reference) for the supported options) and adds some additional options:
 
-- `tokenManager` *(optional)*: An object containing additional properties used to configure the internal token manager. See [AuthJS TokenManager](https://github.com/okta/okta-auth-js#the-tokenmanager) for more detailed information.
-  - `autoRenew` *(optional)*:
-  By default, the library will attempt to renew expired tokens. When an expired token is requested by the library, a renewal request is executed to update the token. If you wish to  to disable auto renewal of tokens, set autoRenew to false.
-  - `secure`: If `true` then only "secure" https cookies will be stored. This option will prevent cookies from being stored on an HTTP connection. This option is only relevant if `storage` is set to `cookie`, or if the client browser does not support `localStorage` or `sessionStorage`, in which case `cookie` storage will be used.
-  - `storage` *(optional)*:
-    Specify the type of storage for tokens.
-    The types are:
-    - [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
-    - [`sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
-    - [`cookie`](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
+##### `onAuthRequired`
 
-#### `oktaAuth.login(fromUri?, additionalParams?)`
+*(optional)* Callback function. Called when authentication is required. If not supplied, `okta-vue` will redirect directly to Okta for authentication. This is triggered when a secure route is accessed without authentication. A common use case for this callback is to redirect users to a custom login route when authentication is required for a SecureRoute.
 
-Calls `onAuthRequired` function if it was set on the initial configuration. Otherwise, it will call `$auth.loginRedirect`. This method accepts a `fromUri` parameter to push the user to after successful authentication, and an optional `additionalParams` object.
+See [Using a custom login-page](#using-a-custom-login-page) for the code sample.
 
-For more information on `additionalParams`, see the [oktaAuth.loginRedirect](#authloginredirectfromuri-additionalparams) method below.
+## Migrating
 
-#### `$auth.loginRedirect(fromUri, additionalParams)`
-
-Performs a full page redirect to Okta based on the initial configuration. This method accepts a `fromUri` parameter to push the user to after successful authentication.
-
-The parameter `additionalParams` is mapped to the [AuthJS OpenID Connect Options](https://github.com/okta/okta-auth-js#openid-connect-options). This will override any existing [configuration](#configuration). As an example, if you have an Okta `sessionToken`, you can bypass the full-page redirect by passing in this token. This is recommended when using the [Okta Sign-In Widget](https://github.com/okta/okta-signin-widget). Simply pass in a `sessionToken` into the `loginRedirect` method follows:
-
-```typescript
-this.$auth.loginRedirect('/profile', {
-  sessionToken: /* sessionToken */
-})
-```
-
-> Note: For information on obtaining a `sessionToken` using the [Okta Sign-In Widget](https://github.com/okta/okta-signin-widget), please see the [`renderEl()` example](https://github.com/okta/okta-signin-widget#rendereloptions-success-error).
-
-#### `$auth.isAuthenticated`
-
-If an `isAuthenticated` function was set on the configuration object, this method will await and return the result from the provided function. Otherwise, it will return `true` if there is either a valid access token **or** an ID token.
-
-#### `$auth.getAccessToken`
-
-Returns the access token from storage (if it exists).
-
-#### `$auth.getIdToken`
-
-Returns the ID token from storage (if it exists).
-
-#### `$auth.getUser`
-
-Returns the result of the OpenID Connect `/userinfo` endpoint if an access token exists.
-
-#### `$auth.handleAuthentication`
-
-Parses the tokens returned as hash fragments in the OAuth 2.0 Redirect URI.
-
-#### `$auth.setFromUri(uri, queryParams)`
-
-Store the current URL state before a redirect occurs.
-
-#### `$auth.getFromUri()`
-
-Returns the stored URI and query parameters stored by `setFromUri`
-
-#### `$auth.getTokenManager`
-
-Returns the internal [TokenManager](https://github.com/okta/okta-auth-js#tokenmanager).
-
-#### `$auth.logout(options?)`
-
-Terminates the user's session in Okta and clears all stored tokens. Accepts an optional `options` parameter. Set `options.postLogoutRedirectUri` to set the uri to push the user to after logout.
+Each major version release introduces breaking changes, see [MIGRATING GUIDE](MIGRATING.md) to get your application properly updated.
 
 ## Contributing
 
