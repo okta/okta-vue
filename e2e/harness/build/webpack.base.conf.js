@@ -34,7 +34,6 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
-      '@okta/okta-vue': resolve('../../dist'),
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src')
     }

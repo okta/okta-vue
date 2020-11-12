@@ -112,4 +112,4 @@ function install (Vue, {
 
 export default { install }
 
-export { default as LoginCallback } from './components/LoginCallback'
+export { default as LoginCallback } from './components/LoginCallback.vue'

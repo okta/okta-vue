@@ -15,7 +15,9 @@
     "lint": "eslint --ext .js,.vue src test/e2e/specs",
     "build": "node build/build.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@okta/okta-vue": "*"
+  },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",
