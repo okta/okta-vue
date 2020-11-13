@@ -2,8 +2,30 @@ import vue from 'rollup-plugin-vue'
 import babel from '@rollup/plugin-babel'
 import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser'
+import cleanup from 'rollup-plugin-cleanup'
+import pkg from './package.json'
 
 const ENV = require('./env')()
+
+const external = [
+  ...Object.keys(pkg.peerDependencies || {}),
+  ...Object.keys(pkg.dependencies || {})
+]
+
+const makeExternalPredicate = externalArr => {
+  if (externalArr.length === 0) {
+    return () => false
+  }
+  const pattern = new RegExp(`^(${externalArr.join('|')})($|/)`)
+  return id => pattern.test(id)
+}
+
+const commonPlugins = [
+  replace({
+    PACKAGE: JSON.stringify(ENV.packageInfo)
+  }),
+  cleanup()
+]
 
 export default [
   {
@@ -15,12 +37,10 @@ export default [
         babelHelpers: 'bundled',
         presets: ['@babel/preset-env']
       }),
-      replace({
-        PACKAGE: JSON.stringify(ENV.packageInfo)
-      }),
+      ...commonPlugins,
       terser()
     ],
-    external: ['@okta/okta-auth-js'],
+    external: makeExternalPredicate(external),
     output: {
       format: 'umd',
       file: 'dist/bundles/okta-vue.umd.js',
@@ -34,7 +54,7 @@ export default [
   },
   {
     input: 'src/okta-vue.js',
-    external: ['@okta/okta-auth-js'],
+    external: makeExternalPredicate(external),
     plugins: [
       vue(),
       babel({
@@ -42,9 +62,7 @@ export default [
         presets: ['@babel/preset-env'],
         plugins: ['@babel/plugin-transform-runtime']
       }),
-      replace({
-        PACKAGE: JSON.stringify(ENV.packageInfo)
-      })
+      ...commonPlugins
     ],
     output: [
       {
