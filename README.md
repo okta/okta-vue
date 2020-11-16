@@ -44,6 +44,8 @@ This library currently supports:
   - A fully functional sample application.
 - [Okta Guide: Sign users into your single-page application](https://developer.okta.com/docs/guides/sign-into-spa/vue/before-you-begin/)
   - Step-by-step guide to integrating an existing Vue application with Okta login.
+- [Strategies for Obtaining Tokens](https://github.com/okta/okta-auth-js#strategies-for-obtaining-tokens)
+  - Okta Vue SDK supports `hash` and `history` router modes. For more details please check specific section of `okta-auth-js`
 
 ## Installation
 
