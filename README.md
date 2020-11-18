@@ -347,3 +347,4 @@ yarn install
 | `yarn start`   | Start the sample app using the SDK |
 | `yarn test`    | Run integration tests              |
 | `yarn lint`    | Run eslint linting tests           |
+
