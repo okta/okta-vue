@@ -305,7 +305,7 @@ Returns the ID token from storage (if it exists).
 
 #### `$auth.getUser`
 
-Returns the result of the OpenID Connect `/userinfo` endpoint if an access token exists.
+Returns the result of the OpenID Connect `/userinfo` endpoint if an access token and an ID token exist.
 
 #### `$auth.handleAuthentication`
 
