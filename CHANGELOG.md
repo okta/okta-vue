@@ -1,3 +1,9 @@
+# 3.0.0
+
+### Breaking Changes
+
+- vue and vue-router become peer dependencies
+
 # 2.1.1
 
 ### Bug Fixes

@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@okta/okta-vue",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Vue support for Okta",
   "main": "dist/bundles/okta-vue.umd.js",
   "files": [
@@ -34,9 +34,7 @@
   "dependencies": {
     "@okta/configuration-validation": "^0.4.1",
     "@okta/okta-auth-js": "^3.2.3",
-    "cross-env": "^5.1.1",
-    "vue": "^2.5.17",
-    "vue-router": "^3.0.1"
+    "cross-env": "^5.1.1"
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.12",
@@ -74,6 +72,10 @@
     "wait-for-expect": "^3.0.0",
     "webpack": "^4.20.0",
     "webpack-cli": "^3.1.2"
+  },
+  "peerDependencies": {
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1"
   },
   "engines": {
     "node": ">= 4.0.0",
