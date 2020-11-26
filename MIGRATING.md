@@ -115,10 +115,6 @@ Guard logic is handled internally in `@okta/okta-vue@3.x`, previous global guard
 
 Previously, tokens would only be renewed when they were read from storge. This typically occurred when a user was navigating to a protected route. Now, tokens will be renewed in the background before they expire. If token renew fails, the [AuthState][] will be updated and `isAuthenticated` will be recalculated. If the user is currently on a protected route, they will need to re-authenticate. Set the `onAuthRequired` option to customize behavior when authentication is required. You can set [tokenManager.autoRenew](https://github.com/okta/okta-auth-js/blob/master/README.md#autorenew) to `false` to disable active token renew logic.
 
-### `isAuthenticated` is called by `transformAuthState`
-
-After the [AuthState][] is updated, but before it is emitted, [transformAuthState][] will be called. During this call, the `isAuthenticated` option, if set on the config object, will be called to set the value of `authState.isAuthenticated`. By default, `authState.isAuthenticated` will be true if **both** the access token and ID token are valid. This logic can be customized by providing a custom `isAuthenticated` function on the config object. You may also provide your own [transformAuthState][] function to customize the [AuthState][] object before it is emitted.
-
 ### `Auth.handleCallback` is replaced by `LoginCallback` component
 
 `LoginCallback` component is exported from `@okta/okta-vue` since version 3.0.0. You should replace `Auth.handleCallback()` with `LoginCallback` component.
