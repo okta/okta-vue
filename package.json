@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@okta/okta-vue",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Vue support for Okta",
   "main": "dist/bundles/okta-vue.cjs.js",
   "module": "dist/bundles/okta-vue.esm.js",
