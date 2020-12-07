@@ -5,7 +5,8 @@ const chalk = require('chalk')
 const fs = require('fs')
 
 const NPM_DIR = `dist`
-const BUNDLE_CMD = `cross-env NODE_ENV=production webpack --config webpack.config.js --output-library-target=umd -p`
+const BUNDLE_CMD = `yarn bundle`
+const BANNER_CMD = `yarn banners`
 const BUNDLES_DIR = `${NPM_DIR}/bundles`
 
 shell.echo(`Start building...`)
@@ -15,7 +16,13 @@ shell.mkdir(`-p`, `./${BUNDLES_DIR}`)
 
 // Bundle using webpack
 if (shell.exec(BUNDLE_CMD).code !== 0) {
-  shell.echo(chalk.red(`Error: Webpack failed`))
+  shell.echo(chalk.red(`Error: Rollup failed`))
+  shell.exit(1)
+}
+
+// Maintain banners
+if (shell.exec(BANNER_CMD).code !== 0) {
+  shell.echo(chalk.red(`Error: Maintain banners failed`))
   shell.exit(1)
 }
 
@@ -29,8 +36,10 @@ packageJSON.private = false
 packageJSON.scripts.prepare = '';
 
 // Remove "dist/" from the entrypoint paths.
-['main'].forEach(function (key) {
-  packageJSON[key] = packageJSON[key].replace('dist/', '')
+['main', 'module'].forEach(function (key) {
+  if (packageJSON[key]) {
+    packageJSON[key] = packageJSON[key].replace('dist/', '')
+  }
 })
 
 fs.writeFileSync(`./${NPM_DIR}/package.json`, JSON.stringify(packageJSON, null, 4))

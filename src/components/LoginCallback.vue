@@ -10,14 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+
 <script>
 export default {
-  name: 'ImplicitCallback',
+  name: 'LoginCallback',
   async beforeMount () {
-    await this.$auth.handleAuthentication()
-    this.$router.replace({
-      path: this.$auth.getFromUri()
-    })
+    await this.$auth.handleLoginRedirect()
   },
   render () {}
 }
