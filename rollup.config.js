@@ -1,8 +1,8 @@
 import vue from 'rollup-plugin-vue'
-import babel from '@rollup/plugin-babel'
 import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser'
 import cleanup from 'rollup-plugin-cleanup'
+import typescript from 'rollup-plugin-typescript2'
 import pkg from './package.json'
 
 const ENV = require('./env')()
@@ -20,6 +20,8 @@ const makeExternalPredicate = externalArr => {
   return id => pattern.test(id)
 }
 
+const input = 'src/okta-vue.ts'
+
 const commonPlugins = [
   replace({
     PACKAGE: JSON.stringify(ENV.packageInfo)
@@ -29,14 +31,13 @@ const commonPlugins = [
 
 export default [
   {
-    input: 'src/okta-vue.js',
+    input,
     plugins: [
-      vue(),
-      babel({
-        babelrc: false,
-        babelHelpers: 'bundled',
-        presets: ['@babel/preset-env']
+      typescript({
+        typescript: require('typescript'),
+        useTsconfigDeclarationDir: true
       }),
+      vue(),
       ...commonPlugins,
       terser()
     ],
@@ -53,15 +54,14 @@ export default [
     }
   },
   {
-    input: 'src/okta-vue.js',
+    input,
     external: makeExternalPredicate(external),
     plugins: [
-      vue(),
-      babel({
-        babelHelpers: 'runtime',
-        presets: ['@babel/preset-env'],
-        plugins: ['@babel/plugin-transform-runtime']
+      typescript({
+        typescript: require('typescript'),
+        useTsconfigDeclarationDir: true
       }),
+      vue(),
       ...commonPlugins
     ],
     output: [

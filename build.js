@@ -36,7 +36,7 @@ packageJSON.private = false
 packageJSON.scripts.prepare = '';
 
 // Remove "dist/" from the entrypoint paths.
-['main', 'module'].forEach(function (key) {
+['main', 'module', 'types'].forEach(function (key) {
   if (packageJSON[key]) {
     packageJSON[key] = packageJSON[key].replace('dist/', '')
   }

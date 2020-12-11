@@ -1,0 +1,23 @@
+{
+  "name": "@okta/test.e2e",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "scripts": {
+    "kill:port": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true",
+    "pree2e": "../../scripts/update_se_drivers.sh",
+    "e2e": "node ./runner.js",
+    "start": "yarn e2e",
+    "posttest": "yarn kill:port",
+    "lint": "eslint --ext .js,.vue src test/e2e/specs"
+  },
+  "devDependencies": {
+    "cross-spawn-with-kill": "^1.0.0",
+    "nightwatch": "^1.5.1",
+    "wait-on": "^5.2.0",
+    "webdriver-manager": "^12.1.4"
+  },
+  "resolutions": {
+    "webdriver-manager": "^12.1.4"
+  }
+}
