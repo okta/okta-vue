@@ -5,6 +5,7 @@
   "description": "Vue support for Okta",
   "main": "dist/bundles/okta-vue.cjs.js",
   "module": "dist/bundles/okta-vue.esm.js",
+  "types": "dist/bundles/types/okta-vue.d.ts",
   "files": [
     "bundles",
     "src"
@@ -14,9 +15,9 @@
     "build": "node build.js",
     "lint": "eslint --ext .js,.vue .",
     "prepare": "yarn build",
-    "start": "yarn --cwd e2e/harness/ start",
+    "start": "yarn --cwd test/app start",
     "test": "yarn lint && yarn test:unit && yarn test:e2e",
-    "test:e2e": "yarn --cwd e2e/harness/ test",
+    "test:e2e": "yarn --cwd test/e2e start",
     "test:unit": "jest",
     "bundle": "rollup -c rollup.config.js",
     "dev": "yarn bundle --watch"
@@ -41,7 +42,7 @@
     "@babel/core": "^7.12.3",
     "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
-    "@okta/okta-auth-js": "^4.1.2",
+    "@okta/okta-auth-js": "^4.4.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-replace": "^2.3.4",
     "@vue/compiler-sfc": "^3.0.2",
@@ -66,8 +67,10 @@
     "rollup": "^2.33.1",
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.29.0",
     "rollup-plugin-vue": "^6.0.0-beta.11",
     "shelljs": "0.8.3",
+    "typescript": "^4.1.2",
     "vue": "^2.6.12",
     "vue-jest": "4.0.0-rc.0",
     "vue-router": "^3.4.9",
@@ -85,7 +88,8 @@
   ],
   "workspaces": [
     "./",
-    "e2e/harness"
+    "test/app",
+    "test/e2e"
   ],
   "peerDependencies": {
     "@okta/okta-auth-js": "^4.1.2",
