@@ -1,25 +1,32 @@
 var ENV = require('./env')()
 
 module.exports = {
-  'globals': {
-    'PACKAGE': ENV.packageInfo
+  globals: {
+    'PACKAGE': ENV.packageInfo,
+    'ts-jest': {
+      diagnostics: {
+        warnOnly: true
+      }
+    }
   },
-  'restoreMocks': true,
-  'moduleFileExtensions': [
+  restoreMocks: true,
+  moduleFileExtensions: [
     'js',
+    'ts',
+    'tsx',
     'json',
     'vue'
   ],
-  'transform': {
-    '^.+\\.js$': '<rootDir>/node_modules/babel-jest',
-    '.*\\.(vue)$': '<rootDir>/node_modules/vue-jest'
+  testMatch: [
+    '**/test/specs/**/*.spec.[jt]s?(x)'
+  ],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.jsx?$': 'babel-jest',
+    '.*\\.(vue)$': 'vue-jest'
   },
-  'moduleNameMapper': {
-    '^@/(.*)$': '<rootDir>/src/$1',
+  moduleNameMapper: {
     '^@okta/okta-auth-js$': '<rootDir>/node_modules/@okta/okta-auth-js/dist/okta-auth-js.umd.js'
   },
-  'roots': [
-    'test/specs'
-  ],
-  'testEnvironment': 'jsdom'
+  testEnvironment: 'jsdom'
 }
