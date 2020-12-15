@@ -31,7 +31,7 @@ shell.echo(chalk.green(`Bundling completed`))
 shell.cp(`-Rf`, [`src`, `package.json`, `LICENSE`, `THIRD-PARTY-NOTICES`, `*.md`], `${NPM_DIR}`)
 
 shell.echo(`Modifying final package.json`)
-let packageJSON = JSON.parse(fs.readFileSync(`./${NPM_DIR}/package.json`))
+const packageJSON = JSON.parse(fs.readFileSync(`./${NPM_DIR}/package.json`))
 packageJSON.private = false
 packageJSON.scripts.prepare = '';
 
