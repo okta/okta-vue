@@ -21,6 +21,7 @@ export default Vue.extend({
   },
   render() { 
     // typescript not allow empty render function, here's the workaround for renderless component
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.$scopedSlots.default && this.$scopedSlots.default({}) as any
   }
 })

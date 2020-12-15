@@ -6,7 +6,11 @@ import router from './router';
 
 Vue.config.productionTip = false;
 
-declare const CONFIG: any
+declare const CONFIG: {
+  ISSUER: string;
+  CLIENT_ID: string;
+  OKTA_TESTING_DISABLEHTTPSCHECK: string;
+}
 
 // To perform end-to-end PKCE flow we must be configured on both ends: when the login is initiated, and on the callback
 // The login page is loaded with a query param. This will select a unique callback url

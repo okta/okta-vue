@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* global PACKAGE */
 import _Vue from 'vue'
 import VueRouter from 'vue-router'
 import { AuthSdkError, OktaAuth, AuthState, toRelativeUrl } from '@okta/okta-auth-js'
@@ -18,8 +17,8 @@ import { OktaVueOptions, OnAuthRequiredFunction } from './types'
 
 // constants are defined in webpack.config.js
 declare const PACKAGE: {
-  name: string
-  version: string
+  name: string;
+  version: string;
 }
 
 let _oktaAuth: OktaAuth
@@ -58,6 +57,7 @@ const AuthStateMixin = _Vue.extend({
   // private property naming convention follows
   // https://vuejs.org/v2/style-guide/#Private-property-names-essential
   methods: {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     async $_oktaVue_handleAuthStateUpdate (authState: AuthState) {
       this.authState = Object.assign(this.authState, authState)
     }
