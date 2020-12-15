@@ -49,7 +49,8 @@ export default [
       name: 'OktaVue',
       exports: 'named',
       globals: {
-        '@okta/okta-auth-js': 'OktaAuth'
+        '@okta/okta-auth-js': 'OktaAuth',
+        'vue': 'Vue'
       }
     }
   },

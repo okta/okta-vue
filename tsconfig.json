@@ -20,7 +20,8 @@
     "types": [
       "vue-router", 
       "vue", 
-      "jest"
+      "jest",
+      "node"
     ]
   },
   "include": [

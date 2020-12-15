@@ -6,9 +6,9 @@
 </template>
 
 <script lang="ts">
-import { OktaVueMixin } from '@okta/okta-vue'
+import { NavigationGuardMixin } from '@okta/okta-vue'
 
-export default OktaVueMixin.extend({
+export default NavigationGuardMixin.extend({
   name: 'Protected',
   data () {
     return {

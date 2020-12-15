@@ -17,12 +17,11 @@ import Vue from 'vue'
 export default Vue.extend({
   name: 'LoginCallback',
   async beforeMount () {
-    console.log('login callback handle redirect')
     await this.$auth.handleLoginRedirect()
   },
   render() { 
     // typescript not allow empty render function, here's the workaround for renderless component
-    return this.$scopedSlots.default!({}) as any
+    return this.$scopedSlots.default && this.$scopedSlots.default({}) as any
   }
 })
 </script>
