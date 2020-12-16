@@ -12,7 +12,7 @@
 
 import { createLocalVue } from '@vue/test-utils'
 import { OktaAuth } from '@okta/okta-auth-js'
-import OktaVue, { LoginCallback } from '../../src/okta-vue'
+import OktaVue, { LoginCallback } from '../../src'
 import InternalLoginCallback from '../../src/components/LoginCallback'
 
 const baseConfig = {

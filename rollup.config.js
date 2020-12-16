@@ -20,7 +20,7 @@ const makeExternalPredicate = externalArr => {
   return id => pattern.test(id)
 }
 
-const input = 'src/okta-vue.ts'
+const input = 'src/index.ts'
 
 const commonPlugins = [
   replace({

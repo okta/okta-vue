@@ -1,5 +1,11 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 3.1.0
+
+### Features
+
+- [#39](https://github.com/okta/okta-vue/pull/39) Adds support for Typescript
+
 # 3.0.0
 
 ### Breaking Changes

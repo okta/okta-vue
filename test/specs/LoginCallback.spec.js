@@ -13,7 +13,7 @@
 import { createLocalVue, mount } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import { OktaAuth } from '@okta/okta-auth-js'
-import OktaVue, { LoginCallback } from '../../src/okta-vue'
+import OktaVue, { LoginCallback } from '../../src'
 
 const oktaAuth = new OktaAuth({
   issuer: 'https://foo',
