@@ -131,5 +131,3 @@ function install (Vue: typeof _Vue, {
 }
 
 export default { install }
-
-export { default as LoginCallback } from './components/LoginCallback.vue'

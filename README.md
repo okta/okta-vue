@@ -248,6 +248,60 @@ This SDK accepts all configuration options defined by [Okta Auth SDK][] (see [Co
 
 See [Using a custom login-page](#using-a-custom-login-page) for the code sample.
 
+## Usage with Typescript
+
+### Use types
+
+Types are implicitly provided by this library through the types entry in package.json. Types can also be referenced explicitly by importing them.
+
+```typescript
+import { OktaVueOptions } from '@okta/okta-vue'
+import { OktaAuth } from '@okta/okta-auth-js'
+
+const oktaAuth = new OktaAuth(/* configs */)
+const options: OktaVueOptions = {
+  oktaAuth
+}
+```
+
+### Use typescript with protected route
+
+This SDK adds [In-Component Guards](https://router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards) via mixin to guard protected routes. You will need to extend your protected route components with `NavigationGuardMixin` instead of `Vue` to trigger the injected navigation guards properly.
+
+```typescript
+// src/components/Protected.vue
+
+<template>
+  <div class="protected">
+    {{ message }}
+    <pre class="userinfo">{{ user }}</pre>
+  </div>
+</template>
+
+<script lang="ts">
+import { NavigationGuardMixin } from '@okta/okta-vue'
+
+export default NavigationGuardMixin.extend({
+  name: 'Protected',
+  data () {
+    return {
+      message: 'Protected!',
+      user: ''
+    }
+  },
+  created () {
+    this.getUser()
+  },
+  methods: {
+    async getUser () {
+      const user = await this.$auth.getUser()
+      this.user = JSON.stringify(user, null, 4)
+    }
+  }
+})
+</script>
+```
+
 ## Migrating
 
 Each major version release introduces breaking changes, see [MIGRATING GUIDE](MIGRATING.md) to get your application properly updated.

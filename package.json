@@ -5,7 +5,7 @@
   "description": "Vue support for Okta",
   "main": "dist/bundles/okta-vue.cjs.js",
   "module": "dist/bundles/okta-vue.esm.js",
-  "types": "dist/bundles/types/okta-vue.d.ts",
+  "types": "dist/bundles/types/index.d.ts",
   "files": [
     "bundles",
     "src"
