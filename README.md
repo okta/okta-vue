@@ -248,7 +248,7 @@ This SDK accepts all configuration options defined by [Okta Auth SDK][] (see [Co
 
 See [Using a custom login-page](#using-a-custom-login-page) for the code sample.
 
-## Usage with Typescript
+## Usage with TypeScript
 
 ### Use types
 
@@ -264,7 +264,7 @@ const options: OktaVueOptions = {
 }
 ```
 
-### Use typescript with protected route
+### Use TypeScript with protected route
 
 This SDK adds [In-Component Guards](https://router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards) via mixin to guard protected routes. You will need to extend your protected route components with `NavigationGuardMixin` instead of `Vue` to trigger the injected navigation guards properly.
 
