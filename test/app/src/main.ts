@@ -1,10 +1,8 @@
-import Vue from 'vue'
-import { OktaAuth } from '@okta/okta-auth-js';
-import OktaVue from '@okta/okta-vue';
-import App from './App.vue';
-import router from './router';
-
-Vue.config.productionTip = false;
+import { createApp } from 'vue'
+import { OktaAuth } from '@okta/okta-auth-js'
+import OktaVue from '@okta/okta-vue'
+import App from './App.vue'
+import router from './router'
 
 declare const CONFIG: {
   ISSUER: string;
@@ -37,9 +35,8 @@ if (CONFIG.OKTA_TESTING_DISABLEHTTPSCHECK) {
 }
 
 const oktaAuth = new OktaAuth(config)
-Vue.use(OktaVue, { oktaAuth })
 
-new Vue({
-  router,
-  render: (h) => h(App)
-}).$mount('#app');
+const app = createApp(App)
+app.use(router)
+app.use(OktaVue, { oktaAuth })
+app.mount('#app')

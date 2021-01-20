@@ -6,9 +6,9 @@
 </template>
 
 <script lang="ts">
-import { NavigationGuardMixin } from '@okta/okta-vue'
+import { defineComponent } from 'vue'
 
-export default NavigationGuardMixin.extend({
+export default defineComponent({
   name: 'Protected',
   data () {
     return {

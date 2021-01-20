@@ -7,9 +7,8 @@ export interface OktaVueOptions {
   onAuthRequired: OnAuthRequiredFunction;
 }
 
-// Declare augmentation for Vue
-declare module 'vue/types/vue' {
-  interface Vue {
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
     $auth: OktaAuth;
     authState: AuthState;
     $_oktaVue_handleAuthStateUpdate: (authState: AuthState) => void;

@@ -15,9 +15,9 @@
     "cross-spawn-with-kill": "^1.0.0",
     "nightwatch": "^1.5.1",
     "wait-on": "^5.2.0",
-    "webdriver-manager": "^12.1.4"
+    "webdriver-manager": "^12.1.8"
   },
   "resolutions": {
-    "webdriver-manager": "^12.1.4"
+    "webdriver-manager": "^12.1.8"
   }
 }

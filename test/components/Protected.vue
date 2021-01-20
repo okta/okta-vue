@@ -1,5 +1,5 @@
 <template>
-  <div>protected</div>
+  <div data-test="protected">protected</div>
 </template>
 
 <script>

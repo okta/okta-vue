@@ -3,6 +3,38 @@
 
 # Migrating
 
+## From version 3.x to 4.x
+
+Most of Okta Vue API has remained unchanged during its rewrite from v3 (for Vue 2) to v4 (for Vue 3) but there are still a few breaking changes that you might encounter while migrating your application.
+
+### Explicitly adds `navigationGuard`
+
+Due to [navigation guards in mixins are not supported in vue-router](https://next.router.vuejs.org/guide/migration/index.html#navigation-guards-in-mixins-are-ignored), `navigationGuard` need to be explicitly added to guard protected routes.
+
+```javascript
+import { createRouter, createWebHistory } from 'vue-router'
+import { navigationGuard } from '@okta/okta-vue'
+
+const router = createRouter({
+  ...
+})
+
+router.beforeEach(navigationGuard)
+
+```
+
+### `NavigationGuardMixin` is removed for TypeScript usage
+
+In version 3, `NavigationGuardMixin` need to be extended by protected route, it's removed in version 4. Protected route can be implement by following [Vue 3 TypeScript standard](https://v3.vuejs.org/guide/typescript-support.html#defining-vue-components).
+
+```typescript
+import { defineComponent } from 'vue'
+
+const Component = defineComponent({
+  // type inference enabled
+})
+```
+
 ## From version 2.x to 3.x
 
 ### Explicitly accepts `oktaAuth` instance from config
