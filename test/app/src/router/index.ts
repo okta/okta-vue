@@ -11,7 +11,6 @@ const router = new VueRouter({
   base: '/',
   routes: [
     { path: '/login/callback', component: LoginCallback },
-    { path: '/pkce/callback', component: LoginCallback },
     { path: '/protected', component: Protected, meta: { requiresAuth: true } },
     { path: '/sessionToken', component: SessionTokenLogin }
   ]
