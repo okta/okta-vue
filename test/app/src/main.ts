@@ -17,7 +17,6 @@ const redirectUri = window.location.origin + '/login/callback'
 const config = {
   issuer: CONFIG.ISSUER,
   redirectUri,
-  pkce: false,
   clientId: CONFIG.CLIENT_ID,
   scopes: ['openid', 'profile', 'email'],
   testing: {
