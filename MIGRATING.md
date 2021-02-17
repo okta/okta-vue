@@ -74,7 +74,7 @@ $auth.logout('/goodbye');
 it should be rewritten as:
 
 ```javascript
-$auth.signOut({ postLogoutRedirectUri: window.location.orign + '/goodbye' });
+$auth.signOut({ postLogoutRedirectUri: window.location.origin + '/goodbye' });
 ```
 
 Note that the value for `postLogoutRedirectUri` must be an absolute URL. This URL must also be on the "allowed list" in your Okta app's configuration. If no options are passed or no `postLogoutRedirectUri` is set on the options object, it will redirect to `window.location.origin` after sign out is complete.
