@@ -31,7 +31,7 @@ module.exports = (overrides = {}) => {
 
   const spaConstants = Object.assign({}, {
     CLIENT_ID: process.env.SPA_CLIENT_ID || process.env.CLIENT_ID || '{clientId}',
-    REDIRECT_URI: `${BASE_URI}/implicit/callback`
+    REDIRECT_URI: `${BASE_URI}/login/callback`
   }, defaults)
 
   const webConstants = Object.assign({}, {
