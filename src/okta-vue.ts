@@ -10,8 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import _Vue from 'vue'
-import VueRouter from 'vue-router'
+import { App } from 'vue'
+import { Router, RouteLocationNormalized } from 'vue-router'
 import { AuthSdkError, OktaAuth, AuthState, toRelativeUrl } from '@okta/okta-auth-js'
 import { OktaVueOptions, OnAuthRequiredFunction } from './types'
 
@@ -23,7 +23,7 @@ declare const PACKAGE: {
 
 let _oktaAuth: OktaAuth
 let _onAuthRequired: OnAuthRequiredFunction
-let _router: VueRouter
+let _router: Router
 let originalUriTracker: string
 
 const guardSecureRoute = async (authState: AuthState) => {
@@ -37,73 +37,43 @@ const guardSecureRoute = async (authState: AuthState) => {
   }
 }
 
-const AuthStateMixin = _Vue.extend({
-  data () {
-    return {
-      authState: _oktaAuth.authStateManager.getAuthState()
+export const navigationGuard = async (to: RouteLocationNormalized) => {
+  // clear any subscribed guardSecureRoute
+  _oktaAuth.authStateManager.unsubscribe(guardSecureRoute)
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // track the originalUri for guardSecureRoute
+    originalUriTracker = to.fullPath
+
+    // subscribe to authState change to protect secure routes when authState change
+    // all secure routes should subscribe before enter the route
+    _oktaAuth.authStateManager.subscribe(guardSecureRoute)
+
+    // guard the secure route based on the authState when enter
+    const isAuthenticated = await _oktaAuth.isAuthenticated()
+    if (!isAuthenticated) {
+      const authState = _oktaAuth.authStateManager.getAuthState()
+      await guardSecureRoute(authState)
+      return false
     }
-  },
-  created () {
-    // subscribe to the latest authState
-    _oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-    if (!_oktaAuth.token.isLoginRedirect()) {
-      // trigger an initial change event to make sure authState is latest
-      _oktaAuth.authStateManager.updateAuthState()
-    }
-  },
-  beforeDestroy () {
-    _oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
-  },
-  // private property naming convention follows
-  // https://vuejs.org/v2/style-guide/#Private-property-names-essential
-  methods: {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    async $_oktaVue_handleAuthStateUpdate (authState: AuthState) {
-      this.authState = Object.assign(this.authState, authState)
-    }
+
+    return true
   }
-})
+    
+  return true
+}
 
-export const NavigationGuardMixin = _Vue.extend({
-  beforeCreate () {
-    // assign router for the default restoreOriginalUri callback
-    _router = this.$router
-  },
-  // "beforeRouteEnter" does NOT have access to `this` component instance
-  async beforeRouteEnter (to, from, next) {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-      // track the originalUri for guardSecureRoute
-      originalUriTracker = to.fullPath
 
-      // subscribe to authState change to protect secure routes when authState change
-      // all secure routes should subscribe before enter the route
-      _oktaAuth.authStateManager.subscribe(guardSecureRoute)
-
-      // guard the secure route based on the authState when enter
-      const isAuthenticated = await _oktaAuth.isAuthenticated()
-      if (!isAuthenticated) {
-        const authState = _oktaAuth.authStateManager.getAuthState()
-        await guardSecureRoute(authState)
-      } else {
-        next()
-      }
-    } else {
-      next()
-    }
-  },
-  beforeRouteLeave (to, from, next) {
-    _oktaAuth.authStateManager.unsubscribe(guardSecureRoute)
-    next()
-  }
-})
-
-function install (Vue: typeof _Vue, {
+function install (app: App, {
   oktaAuth,
   onAuthRequired
 } = {} as OktaVueOptions) {
   if (!oktaAuth) {
     throw new AuthSdkError('No oktaAuth instance passed to OktaVue.')
   }
+
+  _oktaAuth = oktaAuth
+  _onAuthRequired = onAuthRequired
 
   // customize user agent
   oktaAuth.userAgent = `${PACKAGE.name}/${PACKAGE.version} ${oktaAuth.userAgent}`
@@ -115,19 +85,43 @@ function install (Vue: typeof _Vue, {
       if (_router) {
         const path = toRelativeUrl(originalUri, window.location.origin)
         _router.replace({ path })
-        return
       }
     }
   }
 
-  _oktaAuth = oktaAuth
-  _onAuthRequired = onAuthRequired
-
-  Vue.mixin(AuthStateMixin)
-  Vue.mixin(NavigationGuardMixin)
+  app.mixin({
+    data () {
+      return {
+        authState: oktaAuth.authStateManager.getAuthState()
+      }
+    },
+    beforeCreate () {
+      // assign router for the default restoreOriginalUri callback
+      _router = this.$router
+    },
+    created () {
+      // subscribe to the latest authState
+      oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
+      if (!oktaAuth.token.isLoginRedirect()) {
+        // trigger an initial change event to make sure authState is latest
+        oktaAuth.authStateManager.updateAuthState()
+      }
+    },
+    beforeUnmount () {
+      oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
+    },
+    // private property naming convention follows
+    // https://vuejs.org/v2/style-guide/#Private-property-names-essential
+    methods: {
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      async $_oktaVue_handleAuthStateUpdate (authState: AuthState) {
+        this.authState = Object.assign(this.authState, authState)
+      }
+    }
+  })
 
   // add oktaAuth instance to Vue
-  Vue.prototype.$auth = oktaAuth
+  app.config.globalProperties.$auth = oktaAuth
 }
 
 export default { install }

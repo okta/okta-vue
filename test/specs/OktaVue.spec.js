@@ -10,19 +10,18 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { createLocalVue, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import waitForExpect from 'wait-for-expect'
-import VueRouter from 'vue-router'
 import { OktaAuth } from '@okta/okta-auth-js'
 import OktaVue from '../../src/okta-vue'
-import { App, Protected } from '../components'
+import { App } from '../components'
 
 const pkg = require('../../package.json')
 
 describe('OktaVue', () => {
   let oktaAuth
-  let localVue
   let wrapper
+  let mockRouter
 
   function setupOktaAuth () {
     oktaAuth = new OktaAuth({
@@ -33,15 +32,18 @@ describe('OktaVue', () => {
   }
 
   function bootstrap (options = {}) {
-    localVue = createLocalVue()
-    localVue.use(VueRouter)
-    localVue.use(OktaVue, { oktaAuth, ...options })
-    const router = new VueRouter({
-      routes: [{ path: '/protected', component: Protected, meta: { requiresAuth: true } }]
-    })
+    mockRouter = {
+      replace: jest.fn()
+    }
     wrapper = mount(App, {
-      localVue,
-      router
+      global: {
+        plugins: [
+          [OktaVue, { oktaAuth, ...options }]
+        ],
+        mocks: {
+          $router: mockRouter
+        }
+      }
     })
   }
 
@@ -52,7 +54,7 @@ describe('OktaVue', () => {
   it('should add custom userAgent to $auth', () => {
     oktaAuth.userAgent = 'foo'
     bootstrap()
-    expect(localVue.prototype.$auth.userAgent).toBe(`${pkg.name}/${pkg.version} foo`)
+    expect(wrapper.vm.$auth.userAgent).toBe(`${pkg.name}/${pkg.version} foo`)
   })
 
   describe('restoreOriginalUri', () => {
@@ -60,16 +62,20 @@ describe('OktaVue', () => {
     it('should call restoreOriginalUri callback if provided when calls restoreOriginalUri', () => {
       oktaAuth.options.restoreOriginalUri = jest.fn()
       bootstrap()
-      localVue.prototype.$auth.options.restoreOriginalUri(oktaAuth, mockOriginalUri)
+      wrapper.vm.$auth.options.restoreOriginalUri(oktaAuth, mockOriginalUri)
       expect(oktaAuth.options.restoreOriginalUri).toHaveBeenCalledWith(oktaAuth, mockOriginalUri)
     })
 
     it('should call default implementation when restoreOriginalUri callback is not provided', () => {
       bootstrap()
-      jest.spyOn(wrapper.vm.$router, 'replace').mockImplementation()
-      localVue.prototype.$auth.options.restoreOriginalUri(oktaAuth, mockOriginalUri)
-      expect(wrapper.vm.$router.replace).toHaveBeenCalledWith({ path: '/fakepath' })
+      wrapper.vm.$auth.options.restoreOriginalUri(oktaAuth, mockOriginalUri)
+      expect(mockRouter.replace).toHaveBeenCalledWith({ path: '/fakepath' })
     })
+  })
+
+  it('should has authState property in app instance', () => {
+    bootstrap()
+    expect(wrapper.vm.authState).toBeDefined()
   })
 
   describe('render based on authState', () => {
@@ -81,7 +87,7 @@ describe('OktaVue', () => {
       })
     })
 
-    it('should render "authenticated" when authState.isAuthenticated is true', async () => {
+    it('should render "authenticated" when authState.isAuthenticated is true', () => {
       oktaAuth.authStateManager.updateAuthState = jest.fn().mockImplementation(() => {
         oktaAuth.emitter.emit('authStateChange', {
           isPending: false,
@@ -92,7 +98,7 @@ describe('OktaVue', () => {
       expect(wrapper.find('#state').text()).toBe('authenticated')
     })
 
-    it('should render "not authenticated" when authState.isAuthenticated is false', async () => {
+    it('should render "not authenticated" when authState.isAuthenticated is false', () => {
       oktaAuth.authStateManager.updateAuthState = jest.fn().mockImplementation(() => {
         oktaAuth.emitter.emit('authStateChange', {
           isPending: false,
@@ -125,110 +131,8 @@ describe('OktaVue', () => {
   it('should unsubscribe authState change when before component destroy', () => {
     oktaAuth.authStateManager.unsubscribe = jest.fn()
     bootstrap()
-    wrapper.destroy()
+    wrapper.unmount()
     expect(oktaAuth.authStateManager.unsubscribe).toHaveBeenCalledWith(wrapper.vm.$_oktaVue_handleAuthStateUpdate)
   })
 
-  describe('secure route guard', () => {
-    let onAuthRequired
-    beforeEach(() => {
-      // initial general mocks
-      oktaAuth.authStateManager.updateAuthState = jest.fn()
-      oktaAuth.setOriginalUri = jest.fn()
-      oktaAuth.signInWithRedirect = jest.fn()
-      onAuthRequired = jest.fn()
-    })
-
-    describe('enter protected route', () => {
-      it('should show protected component when authed', async () => {
-        oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-          isPending: false,
-          isAuthenticated: true
-        })
-        oktaAuth.isAuthenticated = jest.fn().mockResolvedValue(true)
-        bootstrap()
-        wrapper.vm.$router.push({ path: '/protected' })
-        await waitForExpect(() => {
-          expect(wrapper.find('#state').text()).toBe('authenticated')
-        })
-      })
-
-      it('should call signInWithRedirect when not authed', async () => {
-        oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-          isPending: false,
-          isAuthenticated: false
-        })
-        bootstrap()
-        wrapper.vm.$router.push({ path: '/protected' })
-        await waitForExpect(() => {
-          expect(wrapper.find('#state').text()).toBe('not authenticated')
-          expect(oktaAuth.setOriginalUri).toHaveBeenCalledWith('/protected')
-          expect(oktaAuth.signInWithRedirect).toHaveBeenCalled()
-        })
-      })
-
-      it('should call onAuthRequired if provided from config when not authed', async () => {
-        oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-          isPending: false,
-          isAuthenticated: false
-        })
-        bootstrap({ onAuthRequired })
-        wrapper.vm.$router.push({ path: '/protected' })
-        await waitForExpect(() => {
-          expect(oktaAuth.setOriginalUri).toHaveBeenCalledWith('/protected')
-          expect(onAuthRequired).toHaveBeenCalled()
-        })
-      })
-    })
-
-    describe('authState change when already in the protected route', () => {
-      it('should call signInWithRedirect', async () => {
-        bootstrap()
-        // enter /protected
-        wrapper.vm.$router.push({ path: '/protected' })
-        // change authState
-        oktaAuth.emitter.emit('authStateChange', {
-          isPending: false,
-          isAuthenticated: false
-        })
-        await waitForExpect(() => {
-          expect(wrapper.find('#state').text()).toBe('not authenticated')
-          expect(oktaAuth.setOriginalUri).toHaveBeenCalledWith('/protected')
-          expect(oktaAuth.signInWithRedirect).toHaveBeenCalled()
-        })
-      })
-
-      it('should call onAuthRequired if provided', async () => {
-        bootstrap({ onAuthRequired })
-        // enter /protected
-        wrapper.vm.$router.push({ path: '/protected' })
-        // change authState
-        oktaAuth.emitter.emit('authStateChange', {
-          isPending: false,
-          isAuthenticated: false
-        })
-        await waitForExpect(() => {
-          expect(wrapper.find('#state').text()).toBe('not authenticated')
-          expect(oktaAuth.setOriginalUri).toHaveBeenCalledWith('/protected')
-          expect(onAuthRequired).toHaveBeenCalled()
-          expect(oktaAuth.signInWithRedirect).not.toHaveBeenCalled()
-        })
-      })
-    })
-
-    it('should unsubscribe guard when leave route', async () => {
-      oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isPending: false,
-        isAuthenticated: true
-      })
-      oktaAuth.authStateManager.unsubscribe = jest.fn()
-      const next = jest.fn()
-      bootstrap()
-      const beforeRouteLeave = wrapper.vm.$root.$options.beforeRouteLeave[0]
-      beforeRouteLeave.call(wrapper.vm, undefined, undefined, next)
-      await wrapper.vm.$nextTick()
-      expect(oktaAuth.authStateManager.unsubscribe).toHaveBeenCalled()
-      expect(next).toHaveBeenCalled()
-    })
-  })
 })
