@@ -1,5 +1,11 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 4.0.0
+
+### Breaking Changes
+
+- [#43](https://github.com/okta/okta-vue/pull/43) Support Vue 3 and Vue Router 4. See [MIGRATING](MIGRATING.md) for detailed information.
+
 # 3.1.0
 
 ### Features

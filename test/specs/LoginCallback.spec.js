@@ -11,43 +11,49 @@
  */
 
 import { nextTick } from 'vue';
-import { createLocalVue, mount } from '@vue/test-utils'
-import VueRouter from 'vue-router'
+import { mount } from '@vue/test-utils'
+import { createRouter, createWebHistory } from 'vue-router'
 import { OktaAuth } from '@okta/okta-auth-js'
 import OktaVue, { LoginCallback } from '../../src'
-
-const oktaAuth = new OktaAuth({
-  issuer: 'https://foo',
-  clientId: 'foo',
-  redirectUri: 'https://foo'
-})
+import { AppWithRoutes } from '../components'
 
 describe('LoginCallback', () => {
-  let localVue
+  let oktaAuth
   async function bootstrap (options = {}) {
-    localVue = createLocalVue()
-    localVue.use(VueRouter)
-    localVue.use(OktaVue, { oktaAuth })
-
-    jest.spyOn(localVue.prototype.$auth, 'handleLoginRedirect')
-    jest.spyOn(localVue.prototype.$auth, 'isLoginRedirect').mockReturnValue(options.isLoginRedirect)
-    jest.spyOn(localVue.prototype.$auth, 'storeTokensFromRedirect').mockImplementation(() => {
+    oktaAuth = new OktaAuth({
+      issuer: 'https://foo',
+      clientId: 'foo',
+      redirectUri: 'https://foo'
+    })
+    jest.spyOn(oktaAuth, 'handleLoginRedirect')
+    jest.spyOn(oktaAuth, 'isLoginRedirect').mockReturnValue(options.isLoginRedirect)
+    jest.spyOn(oktaAuth, 'storeTokensFromRedirect').mockImplementation(() => {
       return new Promise(resolve => {
-        if (localVue.prototype.$auth.isLoginRedirect()) {
-          localVue.prototype.$auth.emitter.emit('authStateChange', { isPending: false })
+        if (oktaAuth.isLoginRedirect()) {
+          oktaAuth.emitter.emit('authStateChange', { isPending: false })
         }
         resolve()
       })
     })
-    jest.spyOn(localVue.prototype.$auth.options, 'restoreOriginalUri')
+    oktaAuth.options.restoreOriginalUri = jest.fn()
 
-    const router = new VueRouter({
-      routes: [{ path: '/foo', component: LoginCallback }]
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/', component: LoginCallback }
+      ]
     })
-    mount(LoginCallback, {
-      localVue,
-      router
+    mount(AppWithRoutes, {
+      global: {
+        plugins: [
+          router, 
+          [OktaVue, { oktaAuth }]
+        ]
+      }
     })
+
+    router.push('/')
+    await router.isReady()
     await nextTick() // let promise from handleLoginRedirect resolve
   }
 
@@ -57,16 +63,16 @@ describe('LoginCallback', () => {
 
   it('calls handleLoginRedirect', async () => {
     await bootstrap()
-    expect(localVue.prototype.$auth.handleLoginRedirect).toHaveBeenCalled()
+    expect(oktaAuth.handleLoginRedirect).toHaveBeenCalled()
   })
 
   it('calls the default "restoreOriginalUri" options when in login redirect uri', async () => {
     await bootstrap({ isLoginRedirect: true })
-    expect(localVue.prototype.$auth.options.restoreOriginalUri).toHaveBeenCalled()
+    expect(oktaAuth.options.restoreOriginalUri).toHaveBeenCalled()
   })
 
   it('should not call the default "restoreOriginalUri" options when not in login redirect uri', async () => {
     await bootstrap({ isLoginRedirect: false })
-    expect(localVue.prototype.$auth.options.restoreOriginalUri).not.toHaveBeenCalled()
+    expect(oktaAuth.options.restoreOriginalUri).not.toHaveBeenCalled()
   })
 })

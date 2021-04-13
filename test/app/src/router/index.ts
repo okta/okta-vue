@@ -1,19 +1,17 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import { LoginCallback } from '@okta/okta-vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import { LoginCallback, navigationGuard } from '@okta/okta-vue'
 import Protected from '@/components/Protected.vue';
 import SessionTokenLogin from '@/components/SessionTokenLogin.vue';
 
-Vue.use(VueRouter);
-
-const router = new VueRouter({
-  mode: 'history',
-  base: '/',
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes: [
     { path: '/login/callback', component: LoginCallback },
     { path: '/protected', component: Protected, meta: { requiresAuth: true } },
     { path: '/sessionToken', component: SessionTokenLogin }
   ]
-});
+})
 
-export default router;
+router.beforeEach(navigationGuard)
+
+export default router

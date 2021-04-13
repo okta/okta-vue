@@ -1,13 +1,15 @@
 [Okta Auth SDK]: https://github.com/okta/okta-auth-js
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 [vue-router]: https://router.vuejs.org/en/essentials/getting-started.html
-[Vue prototype]: https://vuejs.org/v2/cookbook/adding-instance-properties.html
-[Vue Plugin]: https://vuejs.org/v2/guide/plugins.html
+[globalProperties]: https://v3.vuejs.org/api/application-config.html#globalproperties
+[Vue Plugin]: https://v3.vuejs.org/guide/plugins.html
 
 # Okta Vue SDK
 
 [![npm version](https://img.shields.io/npm/v/@okta/okta-vue.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-vue)
 [![build status](https://img.shields.io/travis/okta/okta-oidc-js/master.svg?style=flat-square)](https://travis-ci.org/okta/okta-vue)
+
+> Okta Vue V4 is for Vue 3 and Vue Router 4. If you are looking for @okta/okta-vue@3.x which supports Vue 2, please checkout the [master branch](https://github.com/okta/okta-vue).
 
 Okta Vue SDK builds on top of the [Okta Auth SDK][]. This SDK integrates with the [vue-router][] and extends the [Vue prototype][] with an [Okta Auth SDK][] instance to help you quickly add authentication and authorization to your Vue single-page web application.
 
@@ -21,7 +23,7 @@ With the [Okta Auth SDK][], you can:
 All of these features are supported by this SDK. Additionally, using this SDK, you can:
 
 - Add "protected" routes, which will require authentication before render
-- Provide an instance of the [Okta Auth SDK][] to your components on the [Vue prototype][]
+- Add an instance of the [Okta Auth SDK][] to Vue app's global instance by attaching them to [globalProperties][].
 - Inject reactive [authState][] property to your Vue components
 
 > This SDK does not provide any UI components.
@@ -54,7 +56,7 @@ This library currently supports:
 This library is available through [npm](https://www.npmjs.com/package/@okta/okta-vue). To install it, simply add it to your project:
 
 ```bash
-npm install --save @okta/okta-vue
+npm install --save @okta/okta-vue@^4.0.0
 ```
 
 ### Configuration
@@ -64,8 +66,9 @@ You will need the values from the OIDC client that you created in the previous s
 In your application's [vue-router][] configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information:
 
 ```typescript
-// router/index.js
+// main.ts
 
+import { createApp } from 'vue'
 import { OktaAuth } from '@okta/okta-auth-js'
 import OktaVue from '@okta/okta-vue'
 
@@ -75,7 +78,10 @@ const oktaAuth = new OktaAuth({
   redirectUri: window.location.origin + '/login/callback',
   scopes: ['openid', 'profile', 'email']
 })
-Vue.use(OktaVue, { oktaAuth })
+
+const app = createApp(App)
+app.use(OktaVue, { oktaAuth })
+app.mount('#app')
 
 ```
 
@@ -87,11 +93,12 @@ In order to handle the redirect back from Okta, you need to capture the token va
 
 ```typescript
 // router/index.js
+import { createRouter, createWebHistory } from 'vue-router'
 import { LoginCallback } from '@okta/okta-vue'
 
-const router = new Router({
+const router = createRouter({
   ...
-  mode: 'history',
+  history: createWebHistory(process.env.BASE_URL),
   routes: [
     { path: '/login/callback', component: LoginCallback },
     ...
@@ -105,15 +112,32 @@ Route is protected when the `requiresAuth` metadata is added in the configuratio
 
 ```typescript
 // router/index.js
+import { createRouter, createWebHistory } from 'vue-router'
+import { navigationGuard } from '@okta/okta-vue'
+import Protected from '../components/Protected'
 
-{
-  path: '/protected',
-  component: Protected,
-  meta: {
-    requiresAuth: true
-  }
-}
+const router = createRouter({
+  ...
+  history: createWebHistory(process.env.BASE_URL),
+  routes: [
+    {
+      path: '/protected',
+      component: Protected,
+      meta: {
+        requiresAuth: true
+      }
+    }
+    ...
+  ]
+})
+
+// Due to navigation guards mixin issue in vue-router-next, navigation guard logic need to be added manually
+router.beforeEach(navigationGuard)
 ```
+
+> Note: Vue router navigation guards mixin issue is mentioned [here](https://next.router.vuejs.org/guide/migration/index.html#navigation-guards-in-mixins-are-ignored).
+> GitHub issue is tracked [here](https://github.com/vuejs/vue-router-next/issues/454)
+
 
 If a user does not have a valid session, then a new authorization flow will begin. By default, they will be redirected to the Okta Login Page for authentication. Once authenticated, they will be redirected back to your application's protected page. This logic can be customized by setting an [onAuthRequired](#onauthrequired) function on the config object.
 
@@ -133,8 +157,10 @@ In the relevant location in your application, you will want to provide `Login` a
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'app',
   methods: {
     async login () {
@@ -144,7 +170,7 @@ export default {
       await this.$auth.signOut()
     }
   }
-}
+})
 </script>
 ```
 
@@ -196,37 +222,42 @@ To implement a custom login page, set an [onAuthRequired](#onauthrequired) callb
 
 ```typescript
 // router/index.js
+import { createRouter, createWebHistory } from 'vue-router'
 
-import Vue from 'vue'
-import Router from 'vue-router'
-import OktaVue from '@okta/okta-vue'
-import { OktaAuth } from '@okta/okta-auth-js'
-
-const oktaAuth = new OktaAuth(/* config */)
-const router = new Router({
-  mode: 'history',
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes: [
     // other routes ...
     { path: '/login', component: Login }
   ]
 })
 
-Vue.use(Router)
-Vue.use(OktaVue, {
-  oktaAuth
+export default router
+
+// main.ts
+import { createApp } from 'vue'
+import { OktaAuth } from '@okta/okta-auth-js'
+import OktaVue from '@okta/okta-vue'
+import router from './router'
+
+const oktaAuth = new OktaAuth(/* config */)
+const app = createApp(App)
+app.use(router)
+app.use(OktaVue, { 
+  oktaAuth,
   onAuthRequired: (oktaAuth) => {
     router.push({ path: '/login' })
   }
 })
+app.mount('#app')
 
-export default router
 ```
 
 ## Reference
 
 ### `$auth`
 
-This SDK works as a [Vue Plugin][]. It provides an instance of the [Okta Auth SDK][] to your components on the [Vue prototype][]. You can access the [Okta Auth SDK][] instance by using `this.$auth` in your components.
+This SDK works as a [Vue Plugin][]. It provides an instance of the [Okta Auth SDK][] to your components on the [globalProperties][]. You can access the [Okta Auth SDK][] instance by using `this.$auth` in your components.
 
 ### `LoginCallback`
 
@@ -262,44 +293,6 @@ const oktaAuth = new OktaAuth(/* configs */)
 const options: OktaVueOptions = {
   oktaAuth
 }
-```
-
-### Use TypeScript with protected route
-
-This SDK adds [In-Component Guards](https://router.vuejs.org/guide/advanced/navigation-guards.html#in-component-guards) via mixin to guard protected routes. You will need to extend your protected route components with `NavigationGuardMixin` instead of `Vue` to trigger the injected navigation guards properly.
-
-```typescript
-// src/components/Protected.vue
-
-<template>
-  <div class="protected">
-    {{ message }}
-    <pre class="userinfo">{{ user }}</pre>
-  </div>
-</template>
-
-<script lang="ts">
-import { NavigationGuardMixin } from '@okta/okta-vue'
-
-export default NavigationGuardMixin.extend({
-  name: 'Protected',
-  data () {
-    return {
-      message: 'Protected!',
-      user: ''
-    }
-  },
-  created () {
-    this.getUser()
-  },
-  methods: {
-    async getUser () {
-      const user = await this.$auth.getUser()
-      this.user = JSON.stringify(user, null, 4)
-    }
-  }
-})
-</script>
 ```
 
 ## Migrating
