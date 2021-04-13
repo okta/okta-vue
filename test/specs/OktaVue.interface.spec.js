@@ -10,10 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { createLocalVue } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import { OktaAuth } from '@okta/okta-auth-js'
-import OktaVue, { LoginCallback } from '../../src'
+import OktaVue, { LoginCallback, navigationGuard } from '../../src'
 import InternalLoginCallback from '../../src/components/LoginCallback'
+import { navigationGuard as internalNavigationGuard } from '../../src/okta-vue'
 
 const baseConfig = {
   issuer: 'https://foo',
@@ -25,13 +26,24 @@ describe('OktaVue module', () => {
   test('is a Vue plugin', () => {
     expect(OktaVue.install).toBeTruthy()
   })
-  test('Sets an instance of Auth on Vue prototype', () => {
+  test('sets an instance of Auth on Vue prototype', () => {
+    const App = {
+      template: '<div></div>'
+    }
     const oktaAuth = new OktaAuth(baseConfig)
-    const localVue = createLocalVue()
-    localVue.use(OktaVue, { oktaAuth })
-    expect(localVue.prototype.$auth instanceof OktaAuth).toBeTruthy()
+    const wrapper = mount(App, {
+      global: {
+        plugins: [
+          [OktaVue, { oktaAuth }]
+        ]
+      }
+    })
+    expect(wrapper.vm.$auth instanceof OktaAuth).toBeTruthy()
   })
-  test('Exports "LoginCallback" component', () => {
+  test('exports "LoginCallback" component', () => {
     expect(LoginCallback).toBe(InternalLoginCallback)
+  })
+  test('exports "navigationGuard"', () => {
+    expect(navigationGuard).toBe(internalNavigationGuard)
   })
 })

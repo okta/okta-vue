@@ -11,18 +11,16 @@
  */
 
 
-<script lang="ts">
-import Vue from 'vue'
+<script>
+import { defineComponent } from 'vue'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'LoginCallback',
   async beforeMount () {
     await this.$auth.handleLoginRedirect()
   },
-  render() { 
-    // typescript not allow empty render function, here's the workaround for renderless component
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.$scopedSlots.default && this.$scopedSlots.default({}) as any
+  render() {
+    return null
   }
 })
 </script>
