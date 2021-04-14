@@ -2,6 +2,10 @@
 
 # 4.0.0
 
+### Features
+
+- [#52](https://github.com/okta/okta-vue/pull/52) Adds `onAuthResume` option
+
 ### Breaking Changes
 
 - [#43](https://github.com/okta/okta-vue/pull/43) Support Vue 3 and Vue Router 4. See [MIGRATING](MIGRATING.md) for detailed information.

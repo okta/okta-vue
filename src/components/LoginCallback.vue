@@ -16,11 +16,28 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'LoginCallback',
+  data() {
+    return {
+      error: null
+    };
+  },
   async beforeMount () {
-    await this.$auth.handleLoginRedirect()
+    try {
+      await this.$auth.handleLoginRedirect()
+    } catch (e) {
+      if (this.$auth.isInteractionRequiredError(e)) {
+        const { onAuthResume, onAuthRequired } = this.$auth.options;
+        const callbackFn = onAuthResume || onAuthRequired;
+        if (callbackFn) {
+          callbackFn(this.$auth);
+          return;
+        }
+      }
+      this.error = e.toString();
+    }
   },
   render() {
-    return null
+    return this.error
   }
 })
 </script>

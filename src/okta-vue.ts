@@ -66,7 +66,8 @@ export const navigationGuard = async (to: RouteLocationNormalized) => {
 
 function install (app: App, {
   oktaAuth,
-  onAuthRequired
+  onAuthRequired,
+  onAuthResume
 } = {} as OktaVueOptions) {
   if (!oktaAuth) {
     throw new AuthSdkError('No oktaAuth instance passed to OktaVue.')
@@ -118,6 +119,12 @@ function install (app: App, {
         this.authState = Object.assign(this.authState, authState)
       }
     }
+  })
+
+  // add additional options to oktaAuth options
+  Object.assign(oktaAuth.options, {
+    onAuthRequired,
+    onAuthResume
   })
 
   // add oktaAuth instance to Vue

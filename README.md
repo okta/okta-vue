@@ -3,6 +3,8 @@
 [vue-router]: https://router.vuejs.org/en/essentials/getting-started.html
 [globalProperties]: https://v3.vuejs.org/api/application-config.html#globalproperties
 [Vue Plugin]: https://v3.vuejs.org/guide/plugins.html
+[external identity provider]: https://developer.okta.com/docs/concepts/identity-providers/
+[Okta Signin Widget]: https://github.com/okta/okta-signin-widget
 
 # Okta Vue SDK
 
@@ -87,9 +89,9 @@ app.mount('#app')
 
 ### Use the LoginCallback Component
 
-In order to handle the redirect back from Okta, you need to capture the token values from the URL. In this example, `/login/callback` is used as the login redirect URI and [LoginCallback](#logincallback) component is used to obtain tokens. You can customize the callback route with the following example or provide your own component by copying the [LoginCallback component](https://github.com/okta/okta-vue/blob/master/src/components/LoginCallback.vue) to your own source tree and modifying as needed.
+In order to handle the redirect back from Okta, your app will need to read the values returned from Okta and exchange them for tokens. This SDK provides a [LoginCallback](#logincallback) component which calls [$auth.handleLoginRedirect](https://github.com/okta/okta-auth-js#handleloginredirecttokens) to perform this logic. If an error occurs, it will be displayed by the [LoginCallback](#logincallback) component. For custom behavior, the [LoginCallback component file](https://github.com/okta/okta-vue/blob/master/src/components/LoginCallback.vue) can be copied to your own source tree and modified as needed.
 
-**Note:** Make sure you have the `/login/callback` url (absolute url) added in your Okta App's configuration.
+**Note:** Make sure you have the login redirect URI (as an absolute URL) listed in your Okta App's configuration in the Okta Admin console.
 
 ```typescript
 // router/index.js
@@ -253,6 +255,16 @@ app.mount('#app')
 
 ```
 
+#### Resuming the authentication flow
+
+When using a [custom login page](#using-a-custom-login-page) and an [external identity provider][] your app should be prepared to handle a redirect callback from Okta to resume the authentication flow. The [LoginCallback](#logincallback) component has built-in logic for this scenario.
+
+The `redirectUri` of your application will be requested with a special parameter (`?error=interaction_required`) to indicate that the authentication flow should be resumed by the application. In this case, the [LoginCallback](#logincallback) will call the [onAuthResume](#onauthresume) function (if defined). If `onAuthResume` is not defined, then `onAuthRequired` will be called (if defined). If neither method is defined, then the [LoginCallback](#logincallback) component will display the`interaction_required` error as a string.
+
+If the authentication flow began on the custom login page using the [Okta SignIn Widget][], the transaction will automatically resume when the widget is rendered again on the custom login page.
+
+Note that `onAuthResume` has the same signature as `onAuthRequired`. If you do not need any special logic for resuming an authorization flow, you can define only an `onAuthRequired` method and it will be called both to start or resume an auth flow.
+
 ## Reference
 
 ### `$auth`
@@ -278,6 +290,10 @@ This SDK accepts all configuration options defined by [Okta Auth SDK][] (see [Co
 *(optional)* Callback function. Called when authentication is required. If not supplied, `okta-vue` will redirect directly to Okta for authentication. This is triggered when a secure route is accessed without authentication. A common use case for this callback is to redirect users to a custom login route when authentication is required for a SecureRoute.
 
 See [Using a custom login-page](#using-a-custom-login-page) for the code sample.
+
+##### `onAuthResume`
+
+*(optional)*: Callback function. Only relevant if using a [custom login page](#using-a-custom-login-page). Called when the [authentication flow should be resumed by the application](#resuming-the-authentication-flow), typically as a result of redirect callback from an [external identity provider][]. If `onAuthResume` is not defined, `onAuthRequired` will be called instead.
 
 ## Usage with TypeScript
 
