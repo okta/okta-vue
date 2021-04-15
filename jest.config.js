@@ -1,7 +1,7 @@
 var ENV = require('./env')()
 
 module.exports = {
-  coverageDirectory: '<rootDir>/test-reports/coverage',
+  coverageDirectory: '<rootDir>/test-reports/unit',
   collectCoverage: true,
   collectCoverageFrom: [
     './src/**',
