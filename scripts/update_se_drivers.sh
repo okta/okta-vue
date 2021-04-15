@@ -117,6 +117,12 @@ function setChromeDriverVersion() {
             88)
                 CHROME_DRIVER_VER=88.0.4324.96
             ;;
+            89)
+                CHROME_DRIVER_VER=89.0.4389.23
+            ;;
+            90)
+                CHROME_DRIVER_VER=90.0.4430.24
+            ;;
             *)
                 CHROME_DRIVER_VER=${DEFAULT_CHROME_DRIVER_VER}
             ;;

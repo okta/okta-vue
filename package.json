@@ -84,7 +84,8 @@
     "vue-jest": "4.0.0-rc.0",
     "vue-router": "^3.4.9",
     "vue-template-compiler": "^2.6.12",
-    "wait-for-expect": "^3.0.0"
+    "wait-for-expect": "^3.0.0",
+    "webdriver-manager": "^12.1.8"
   },
   "jest-junit": {
     "outputDirectory": "./test-reports/unit/",

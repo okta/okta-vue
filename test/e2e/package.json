@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "kill:port": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true",
-    "pree2e": "../../scripts/update_se_drivers.sh",
+    "pree2e": "node ../../scripts/update-se-drivers.js",
     "e2e": "node ./runner.js",
     "start": "yarn e2e",
     "posttest": "yarn kill:port",

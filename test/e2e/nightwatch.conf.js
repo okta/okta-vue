@@ -8,7 +8,7 @@ module.exports = {
 
   selenium: {
     start_process: true,
-    server_path: '../../node_modules/webdriver-manager/selenium/selenium-server-standalone.jar',
+    server_path: '../../node_modules/webdriver-manager/selenium/selenium-server-standalone-3.141.59.jar',
     host: '127.0.0.1',
     port: 4444,
     cli_args: {
