@@ -7,6 +7,10 @@ module.exports = {
     './src/**',
     '!./test/**'
   ],
+  reporters: [
+    'default',
+    'jest-junit'
+  ],
   globals: {
     'PACKAGE': ENV.packageInfo,
     'ts-jest': {
