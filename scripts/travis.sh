@@ -4,6 +4,6 @@ if [ "${TRAVIS_EVENT_TYPE}" = "cron" ] ; then
     export RUN_SAUCE_TESTS=true;
     yarn test:e2e
 else
-    # run the lint, unit and e2e tests (on chrome headless)
+    # run the lint and unit tests (on chrome headless)
     yarn test
 fi
