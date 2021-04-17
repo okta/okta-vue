@@ -1,6 +1,16 @@
 var ENV = require('./env')()
 
 module.exports = {
+  coverageDirectory: '<rootDir>/test-reports/unit',
+  collectCoverage: true,
+  collectCoverageFrom: [
+    './src/**',
+    '!./test/**'
+  ],
+  reporters: [
+    'default',
+    'jest-junit'
+  ],
   globals: {
     'PACKAGE': ENV.packageInfo,
     'ts-jest': {

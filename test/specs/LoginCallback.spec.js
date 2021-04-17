@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { nextTick } from 'vue';
 import { createLocalVue, mount } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import { OktaAuth } from '@okta/okta-auth-js'
@@ -23,7 +24,7 @@ const oktaAuth = new OktaAuth({
 
 describe('LoginCallback', () => {
   let localVue
-  function bootstrap (options = {}) {
+  async function bootstrap (options = {}) {
     localVue = createLocalVue()
     localVue.use(VueRouter)
     localVue.use(OktaVue, { oktaAuth })
@@ -47,24 +48,25 @@ describe('LoginCallback', () => {
       localVue,
       router
     })
+    await nextTick() // let promise from handleLoginRedirect resolve
   }
 
-  it('renders the component', () => {
-    bootstrap()
+  it('renders the component', async () => {
+    await bootstrap()
   })
 
-  it('calls handleLoginRedirect', () => {
-    bootstrap()
+  it('calls handleLoginRedirect', async () => {
+    await bootstrap()
     expect(localVue.prototype.$auth.handleLoginRedirect).toHaveBeenCalled()
   })
 
-  it('calls the default "restoreOriginalUri" options when in login redirect uri', () => {
-    bootstrap({ isLoginRedirect: true })
+  it('calls the default "restoreOriginalUri" options when in login redirect uri', async () => {
+    await bootstrap({ isLoginRedirect: true })
     expect(localVue.prototype.$auth.options.restoreOriginalUri).toHaveBeenCalled()
   })
 
-  it('should not call the default "restoreOriginalUri" options when not in login redirect uri', () => {
-    bootstrap({ isLoginRedirect: false })
+  it('should not call the default "restoreOriginalUri" options when not in login redirect uri', async () => {
+    await bootstrap({ isLoginRedirect: false })
     expect(localVue.prototype.$auth.options.restoreOriginalUri).not.toHaveBeenCalled()
   })
 })

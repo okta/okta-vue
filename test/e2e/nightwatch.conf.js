@@ -3,12 +3,12 @@ const { spaConstants } = require('../../env')()
 // http://nightwatchjs.org/gettingstarted#settings-file
 module.exports = {
   src_folders: ['./specs'],
-  output_folder: './reports/junit',
+  output_folder: '../../test-reports/e2e',
   custom_assertions_path: ['./custom-assertions'],
 
   selenium: {
     start_process: true,
-    server_path: '../../node_modules/webdriver-manager/selenium/selenium-server-standalone.jar',
+    server_path: '../../node_modules/webdriver-manager/selenium/selenium-server-standalone-3.141.59.jar',
     host: '127.0.0.1',
     port: 4444,
     cli_args: {
