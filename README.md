@@ -153,7 +153,7 @@ In the relevant location in your application, you will want to provide `Login` a
 <template>
   <div id="app">
     <router-link to="/" tag="button" id='home-button'> Home </router-link>
-    <button v-if='authState.isAuthenticated' v-on:click='logout' id='logout-button'> Logout </button>
+    <button v-if='authState && authState.isAuthenticated' v-on:click='logout' id='logout-button'> Logout </button>
     <button v-else v-on:click='login' id='login-button'> Login </button>
     <router-view/>
   </div>

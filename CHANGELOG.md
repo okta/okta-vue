@@ -1,5 +1,14 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.0.0
+
+### Breaking Changes
+
+- [#56](https://github.com/okta/okta-vue/pull/56) Requires [@okta/okta-auth-js 5.x](https://github.com/okta/okta-auth-js/#from-4x-to-5x)
+  - Initial `AuthState` is null
+  - Removed `isPending` from `AuthState`
+  - Default value for `originalUri` is null
+
 # 4.0.0
 
 ### Features

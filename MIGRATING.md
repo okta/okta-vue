@@ -3,6 +3,13 @@
 
 # Migrating
 
+## From version 4.x to 5.x
+
+`@okta/okta-vue` 5.x requires `@okta/okta-auth-js` 5.x (see [notes for migration](https://github.com/okta/okta-auth-js/#from-4x-to-5x)). Some chnages affects `@okta/okta-vue`:
+  - Initial `AuthState` is null
+  - Removed `isPending` from `AuthState`
+  - Default value for `originalUri` is null
+
 ## From version 3.x to 4.x
 
 Most of Okta Vue API has remained unchanged during its rewrite from v3 (for Vue 2) to v4 (for Vue 3) but there are still a few breaking changes that you might encounter while migrating your application.
