@@ -83,7 +83,7 @@ function install (app: App, {
   if (!oktaAuth.options.restoreOriginalUri) {
     oktaAuth.options.restoreOriginalUri = async (oktaAuth: OktaAuth, originalUri: string) => {
       // If a router is available, provide a default implementation
-      if (_router) {
+      if (_router && originalUri) {
         const path = toRelativeUrl(originalUri, window.location.origin)
         _router.replace({ path })
       }
@@ -104,19 +104,21 @@ function install (app: App, {
       // subscribe to the latest authState
       oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
       if (!oktaAuth.token.isLoginRedirect()) {
-        // trigger an initial change event to make sure authState is latest
-        oktaAuth.authStateManager.updateAuthState()
+        // Calculates initial auth state and fires change event for listeners
+        // Also starts the token auto-renew service
+        oktaAuth.start();
       }
     },
     beforeUnmount () {
       oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
+      oktaAuth.stop()
     },
     // private property naming convention follows
     // https://vuejs.org/v2/style-guide/#Private-property-names-essential
     methods: {
       // eslint-disable-next-line @typescript-eslint/camelcase
       async $_oktaVue_handleAuthStateUpdate (authState: AuthState) {
-        this.authState = Object.assign(this.authState, authState)
+        this.authState = Object.assign(this.authState || {}, authState)
       }
     }
   })

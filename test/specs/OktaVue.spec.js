@@ -90,7 +90,6 @@ describe('OktaVue', () => {
     it('should render "authenticated" when authState.isAuthenticated is true', () => {
       oktaAuth.authStateManager.updateAuthState = jest.fn().mockImplementation(() => {
         oktaAuth.emitter.emit('authStateChange', {
-          isPending: false,
           isAuthenticated: true
         })
       })
@@ -101,7 +100,6 @@ describe('OktaVue', () => {
     it('should render "not authenticated" when authState.isAuthenticated is false', () => {
       oktaAuth.authStateManager.updateAuthState = jest.fn().mockImplementation(() => {
         oktaAuth.emitter.emit('authStateChange', {
-          isPending: false,
           isAuthenticated: false
         })
       })
@@ -111,7 +109,6 @@ describe('OktaVue', () => {
 
     it('should render based on preset authState from oktaAuth', () => {
       oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isPending: false,
         isAuthenticated: false
       })
       oktaAuth.authStateManager.updateAuthState = jest.fn()
@@ -119,7 +116,6 @@ describe('OktaVue', () => {
       expect(wrapper.find('#state').text()).toBe('not authenticated')
 
       oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isPending: false,
         isAuthenticated: true
       })
       oktaAuth.authStateManager.updateAuthState = jest.fn()
