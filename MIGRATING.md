@@ -5,7 +5,7 @@
 
 ## From version 4.x to 5.x
 
-`@okta/okta-vue` 5.x requires `@okta/okta-auth-js` 5.x (see [notes for migration](https://github.com/okta/okta-auth-js/#from-4x-to-5x)). Some chnages affects `@okta/okta-vue`:
+`@okta/okta-vue` 5.x requires `@okta/okta-auth-js` 5.x (see [notes for migration](https://github.com/okta/okta-auth-js/#from-4x-to-5x)). Some changes affects `@okta/okta-vue`:
   - Initial `AuthState` is null
   - Removed `isPending` from `AuthState`
   - Default value for `originalUri` is null
