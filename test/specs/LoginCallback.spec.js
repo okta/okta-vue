@@ -39,7 +39,7 @@ describe('LoginCallback', () => {
     jest.spyOn(oktaAuth, 'storeTokensFromRedirect').mockImplementation(() => {
       return new Promise(resolve => {
         if (oktaAuth.isLoginRedirect()) {
-          oktaAuth.emitter.emit('authStateChange', { isPending: false })
+          oktaAuth.emitter.emit('authStateChange', { })
         }
         resolve()
       })

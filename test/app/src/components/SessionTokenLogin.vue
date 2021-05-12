@@ -25,12 +25,10 @@ export default defineComponent({
         username: this.username,
         password: this.password
       })
-      .then(res =>
-        this.$auth.signInWithRedirect({
-          originalUri: '/protected',
-          sessionToken: res.sessionToken
-        })
-      )
+      .then(res => {
+        this.$auth.setOriginalUri('/protected');
+        return this.$auth.token.getWithRedirect({sessionToken: res.sessionToken});
+      })
       .catch(err => console.error(`Found an error: ${err}`))
     }
   }

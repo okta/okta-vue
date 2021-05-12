@@ -73,7 +73,6 @@ describe('NavigationGuard', () => {
   describe('enter protected route', () => {
     it('should show protected component when authed', async () => {
       oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isPending: false,
         isAuthenticated: true
       })
       oktaAuth.isAuthenticated = jest.fn().mockResolvedValue(true)
@@ -86,7 +85,6 @@ describe('NavigationGuard', () => {
 
     it('should call signInWithRedirect when not authed', async () => {
       oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isPending: false,
         isAuthenticated: false
       })
       bootstrap()
@@ -100,7 +98,6 @@ describe('NavigationGuard', () => {
 
     it('should call onAuthRequired if provided from config when not authed', async () => {
       oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isPending: false,
         isAuthenticated: false
       })
       bootstrap({ onAuthRequired })
@@ -115,7 +112,6 @@ describe('NavigationGuard', () => {
   describe('authState change when already in the protected route', () => {
     beforeEach(async () => {
       oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
-        isPending: false,
         isAuthenticated: true
       })
       oktaAuth.isAuthenticated = jest.fn().mockResolvedValue(true)
@@ -128,7 +124,6 @@ describe('NavigationGuard', () => {
       await router.isReady()
       // change authState
       oktaAuth.emitter.emit('authStateChange', {
-        isPending: false,
         isAuthenticated: false
       })
       await waitForExpect(() => {
@@ -144,7 +139,6 @@ describe('NavigationGuard', () => {
       await router.isReady()
       // change authState
       oktaAuth.emitter.emit('authStateChange', {
-        isPending: false,
         isAuthenticated: false
       })
       await waitForExpect(() => {

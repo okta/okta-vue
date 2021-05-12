@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@okta/okta-vue",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "Vue support for Okta",
   "main": "dist/bundles/okta-vue.cjs.js",
   "module": "dist/bundles/okta-vue.esm.js",
@@ -43,7 +43,7 @@
     "@babel/core": "^7.12.3",
     "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
-    "@okta/okta-auth-js": "^4.8.0",
+    "@okta/okta-auth-js": "^5.0.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-replace": "^2.3.4",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
@@ -106,7 +106,7 @@
     "test/e2e"
   ],
   "peerDependencies": {
-    "@okta/okta-auth-js": "^4.8.0",
+    "@okta/okta-auth-js": "^5.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.3"
   }
