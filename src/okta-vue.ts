@@ -73,6 +73,14 @@ function install (app: App, {
     throw new AuthSdkError('No oktaAuth instance passed to OktaVue.')
   }
 
+  const oktaAuthMajorVersion = oktaAuth.userAgent?.split('/')[1]?.split('.')[0];
+  if (oktaAuthMajorVersion && oktaAuthMajorVersion !== process.env.AUTH_JS_MAJOR_VERSION) {
+    throw new AuthSdkError(`
+      Passed in oktaAuth is not compatible with the SDK,
+      okta-auth-js version ${process.env.AUTH_JS_MAJOR_VERSION}.x is the current supported version.
+    `);
+  }
+
   _oktaAuth = oktaAuth
   _onAuthRequired = onAuthRequired
 

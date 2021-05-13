@@ -24,7 +24,8 @@ const input = 'src/index.ts'
 
 const commonPlugins = [
   replace({
-    PACKAGE: JSON.stringify(ENV.packageInfo)
+    PACKAGE: JSON.stringify(ENV.packageInfo),
+    'process.env.AUTH_JS_MAJOR_VERSION': JSON.stringify(process.env.AUTH_JS_MAJOR_VERSION)
   }),
   cleanup()
 ]

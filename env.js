@@ -4,6 +4,7 @@ const PACKAGE = require('./package.json')
 const path = require('path')
 const dotenv = require('dotenv')
 const fs = require('fs')
+const semver = require('semver')
 
 // Read environment variables from "testenv". Override environment vars if they are already set.
 const TESTENV = path.resolve(__dirname, 'testenv')
@@ -15,6 +16,9 @@ if (fs.existsSync(TESTENV)) {
   })
 }
 process.env.CLIENT_ID = process.env.CLIENT_ID || process.env.SPA_CLIENT_ID
+
+const authJsVersion = PACKAGE.peerDependencies['@okta/okta-auth-js'];
+process.env.AUTH_JS_MAJOR_VERSION = semver.minVersion(authJsVersion).major;
 
 module.exports = (overrides = {}) => {
   const PORT = overrides.port || process.env.PORT || 3000
