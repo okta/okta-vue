@@ -1,4 +1,8 @@
-[authState]: https://github.com/okta/okta-auth-js#authstatemanager
+# 4.0.1
+
+### Bug Fixes
+
+- [#60](https://github.com/okta/okta-vue/pull/60) Locks the SDK with installed okta-auth-js major version
 
 # 4.0.0
 
