@@ -12,7 +12,7 @@
 
 import { mount } from '@vue/test-utils'
 import waitForExpect from 'wait-for-expect'
-import { OktaAuth } from '@okta/okta-auth-js'
+import { AuthSdkError, OktaAuth } from '@okta/okta-auth-js'
 import OktaVue from '../../src/okta-vue'
 import { App } from '../components'
 
@@ -55,6 +55,11 @@ describe('OktaVue', () => {
     oktaAuth.userAgent = 'foo'
     bootstrap()
     expect(wrapper.vm.$auth.userAgent).toBe(`${pkg.name}/${pkg.version} foo`)
+  })
+
+  it('throws when provided OktaAuth instance of unsupported version', () => {
+    oktaAuth.userAgent = 'okta-auth-js/99.0.42';
+    expect(() => bootstrap()).toThrow(AuthSdkError);
   })
 
   describe('restoreOriginalUri', () => {
@@ -115,6 +120,8 @@ describe('OktaVue', () => {
       bootstrap()
       expect(wrapper.find('#state').text()).toBe('not authenticated')
 
+      // reset modified auth-js' userAgent
+      setupOktaAuth()
       oktaAuth.authStateManager.getAuthState = jest.fn().mockReturnValue({
         isAuthenticated: true
       })
