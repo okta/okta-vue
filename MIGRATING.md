@@ -69,6 +69,8 @@ const oktaAuth = new OktaAuth({
 Vue.use(OktaVue, { oktaAuth })
 ```
 
+> Note: Major version of supplied `@okta/okta-auth-js` SDK insntance should match the major version of `@okta/okta-auth-js` peerDependency of `@okta/okta-vue` SDK.
+
 ### Full `@okta/okta-auth-js` API is available
 
 `@okta/okta-vue` version 2.x and earlier provided a wrapper around [@okta/okta-auth-js][] but many methods were hidden. Version 3.x replaces `Auth` service with instance of [@okta/okta-auth-js][] for `$auth`, so the full [api](https://github.com/okta/okta-auth-js#api-reference) and all [options](https://github.com/okta/okta-auth-js#configuration-options) are now supported by this SDK. To provide a better experience, several methods which existed on the wrapper have been removed or replaced.
