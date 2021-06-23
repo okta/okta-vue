@@ -36,15 +36,7 @@ describe('LoginCallback', () => {
 
   async function navigateToCallback (options = {}) {
     jest.spyOn(oktaAuth, 'isLoginRedirect').mockReturnValue(options.isLoginRedirect)
-    jest.spyOn(oktaAuth, 'storeTokensFromRedirect').mockImplementation(() => {
-      return new Promise(resolve => {
-        if (oktaAuth.isLoginRedirect()) {
-          oktaAuth.emitter.emit('authStateChange', { })
-        }
-        resolve()
-      })
-    })
-    oktaAuth.options.restoreOriginalUri = jest.fn()
+    jest.spyOn(oktaAuth, 'storeTokensFromRedirect').mockResolvedValue(undefined)
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -60,17 +52,15 @@ describe('LoginCallback', () => {
         ]
       }
     })
-
+    
     router.push('/')
     await router.isReady()
-    await nextTick() // let promise from handleLoginRedirect resolve
   }
 
   it('renders the component', async () => {
     createOktaAuth()
     jest.spyOn(LoginCallback, 'render')
     await navigateToCallback()
-    await 
     expect(LoginCallback.render).toHaveBeenCalled()
     expect(wrapper.text()).toBe('')
   })
@@ -85,12 +75,18 @@ describe('LoginCallback', () => {
   it('calls the default "restoreOriginalUri" options when in login redirect uri', async () => {
     createOktaAuth()
     await navigateToCallback({ isLoginRedirect: true })
+    jest.spyOn(oktaAuth.options, 'restoreOriginalUri')
+    // nextTick only wait on dom updates, explicitly wait for the next event loop happen as no dom update here
+    await new Promise(resolve => setTimeout(resolve))
     expect(oktaAuth.options.restoreOriginalUri).toHaveBeenCalled()
   })
 
   it('should not call the default "restoreOriginalUri" options when not in login redirect uri', async () => {
     createOktaAuth()
     await navigateToCallback({ isLoginRedirect: false })
+    jest.spyOn(oktaAuth.options, 'restoreOriginalUri');
+    // nextTick only wait on dom updates, explicitly wait for the next event loop happen as no dom update here
+    await new Promise(resolve => setTimeout(resolve))
     expect(oktaAuth.options.restoreOriginalUri).not.toHaveBeenCalled()
   })
 
