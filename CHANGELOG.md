@@ -9,6 +9,10 @@
   - Removed `isPending` from `AuthState`
   - Default value for `originalUri` is null
 
+### Others
+
+- [#68](https://github.com/okta/okta-vue/pull/68) Upgrades dependencies
+
 # 4.0.1
 
 ### Bug Fixes

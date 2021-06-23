@@ -35,8 +35,5 @@ module.exports = {
     '^.+\\.jsx?$': 'babel-jest',
     '.*\\.(vue)$': 'vue-jest'
   },
-  moduleNameMapper: {
-    '^@okta/okta-auth-js$': '<rootDir>/node_modules/@okta/okta-auth-js/dist/okta-auth-js.umd.js'
-  },
   testEnvironment: 'jsdom'
 }
