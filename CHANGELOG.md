@@ -1,5 +1,11 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.0.1
+
+### Bug Fixes
+
+- [70](https://github.com/okta/okta-vue/pull/70) Fix token auto renew by using @okta/okta-auth-js ^5.2.3
+
 # 5.0.0
 
 ### Breaking Changes
