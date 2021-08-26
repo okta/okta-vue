@@ -51,14 +51,16 @@ describe('OktaVue', () => {
     setupOktaAuth()
   })
 
-  it('should add custom userAgent to $auth', () => {
-    oktaAuth.userAgent = 'foo'
+  it('should add environment to oktaAuth\'s _oktaUserAgent', () => {
     bootstrap()
-    expect(wrapper.vm.$auth.userAgent).toBe(`${pkg.name}/${pkg.version} foo`)
+    const userAgent = wrapper.vm.$auth._oktaUserAgent.getHttpHeader()['X-Okta-User-Agent-Extended'];
+    expect(
+      userAgent.indexOf(`${pkg.name}/${pkg.version}`)
+    ).toBeGreaterThan(-1);
   })
 
   it('throws when provided OktaAuth instance of unsupported version', () => {
-    oktaAuth.userAgent = 'okta-auth-js/99.0.42';
+    oktaAuth._oktaUserAgent.getVersion = jest.fn().mockReturnValue('okta-auth-js/99.0.42');
     expect(() => bootstrap()).toThrow(AuthSdkError);
   })
 
