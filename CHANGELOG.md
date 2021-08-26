@@ -1,5 +1,12 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.0.2
+
+### Other
+
+[#73](https://github.com/okta/okta-vue/pull/73) Requires @okta/okta-auth-js ^5.3.1
+
+
 # 5.0.1
 
 ### Bug Fixes
