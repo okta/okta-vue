@@ -1242,6 +1242,13 @@
     core-js "^3.15.1"
     jsonpath-plus "^5.1.0"
 
+"@okta/okta-vue@*":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-vue/-/okta-vue-5.0.1.tgz#f9221ed0dae8610453271d9ff45535c570c52b75"
+  integrity sha512-1r9sfxC/+BHQKCOPDRJf6dakGqn2vj1uKwO1On2YvuUiIbkAPmpw39g9IzyXF4gZqmW5/pKoyIgX87dVk9yexQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+
 "@peculiar/asn1-schema@^2.0.27":
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.0.36.tgz#ca7978f43ffa4f35fbb74436c3f983c10a69ac27"
@@ -10876,9 +10883,9 @@ tmp@^0.0.33:
     os-tmpdir "~1.0.2"
 
 tmpl@1.0.x:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/tmpl/-/tmpl-1.0.4.tgz#23640dd7b42d00433911140820e5cf440e521dd1"
-  integrity sha1-I2QN17QtAEM5ERQIIOXPRA5SHdE=
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/tmpl/-/tmpl-1.0.5.tgz#8683e0b902bb9c20c4f726e3c0b69f36518c07cc"
+  integrity sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==
 
 to-arraybuffer@^1.0.0:
   version "1.0.1"
