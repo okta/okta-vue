@@ -26,8 +26,8 @@ let _onAuthRequired: OnAuthRequiredFunction
 let _router: Router
 let originalUriTracker: string
 
-const guardSecureRoute = async (authState: AuthState) => {
-  if (!authState.isAuthenticated) {
+const guardSecureRoute = async (authState: AuthState | null) => {
+  if (authState && !authState.isAuthenticated) {
     _oktaAuth.setOriginalUri(originalUriTracker)
     if (_onAuthRequired) {
       await _onAuthRequired(_oktaAuth)
@@ -53,9 +53,7 @@ export const navigationGuard = async (to: RouteLocationNormalized) => {
     const isAuthenticated = await _oktaAuth.isAuthenticated()
     if (!isAuthenticated) {
       const authState = _oktaAuth.authStateManager.getAuthState()
-      if (authState) {
-        await guardSecureRoute(authState)
-      }
+      await guardSecureRoute(authState)
       return false
     }
 
