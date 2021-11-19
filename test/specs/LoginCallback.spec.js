@@ -72,8 +72,24 @@ describe('LoginCallback', () => {
     expect(oktaAuth.handleLoginRedirect).toHaveBeenCalled()
   })
 
+  it('starts oktaAuth service on login redirect', async () => {
+    createOktaAuth()
+    jest.spyOn(oktaAuth, 'handleLoginRedirect');
+    jest.spyOn(oktaAuth, 'start');
+    await navigateToCallback()
+    expect(oktaAuth.handleLoginRedirect).toHaveBeenCalled()
+    expect(oktaAuth.start).toHaveBeenCalled()
+  })
+
   it('calls the default "restoreOriginalUri" options when in login redirect uri', async () => {
     createOktaAuth()
+
+    const parseFromUrl = oktaAuth.token.parseFromUrl = jest.fn();
+    parseFromUrl._getLocation = jest.fn().mockReturnValue({
+      hash: '#mock-hash',
+      search: '?mock-search'
+    });
+    
     await navigateToCallback({ isLoginRedirect: true })
     jest.spyOn(oktaAuth.options, 'restoreOriginalUri')
     // nextTick only wait on dom updates, explicitly wait for the next event loop happen as no dom update here

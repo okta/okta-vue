@@ -53,7 +53,9 @@ export const navigationGuard = async (to: RouteLocationNormalized) => {
     const isAuthenticated = await _oktaAuth.isAuthenticated()
     if (!isAuthenticated) {
       const authState = _oktaAuth.authStateManager.getAuthState()
-      await guardSecureRoute(authState)
+      if (authState) {
+        await guardSecureRoute(authState)
+      }
       return false
     }
 
@@ -111,11 +113,9 @@ function install (app: App, {
     created () {
       // subscribe to the latest authState
       oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-      if (!oktaAuth.token.isLoginRedirect()) {
-        // Calculates initial auth state and fires change event for listeners
-        // Also starts the token auto-renew service
-        oktaAuth.start();
-      }
+      // Calculates initial auth state and fires change event for listeners
+      // Also starts the token auto-renew service
+      oktaAuth.start();
     },
     beforeUnmount () {
       oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
