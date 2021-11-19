@@ -111,9 +111,11 @@ function install (app: App, {
     created () {
       // subscribe to the latest authState
       oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-      // Calculates initial auth state and fires change event for listeners
-      // Also starts the token auto-renew service
-      oktaAuth.start();
+      if (!oktaAuth.token.isLoginRedirect()) {
+        // Calculates initial auth state and fires change event for listeners
+        // Also starts the token auto-renew service
+        oktaAuth.start();
+      }
     },
     beforeUnmount () {
       oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)

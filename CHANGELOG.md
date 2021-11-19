@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- [77](https://github.com/okta/okta-vue/pull/77) Fix issue with `navigationGuard` by starting `oktaAuth` service for login redirect
+- [77](https://github.com/okta/okta-vue/pull/77) Fix issue with `navigationGuard` by starting `oktaAuth` service after handling login redirect
 
 ### Others
 
