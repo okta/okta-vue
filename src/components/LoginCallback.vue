@@ -24,6 +24,7 @@ export default defineComponent({
   async beforeMount () {
     try {
       await this.$auth.handleLoginRedirect()
+      this.$auth.start();
     } catch (e) {
       if (this.$auth.isInteractionRequiredError(e)) {
         const { onAuthResume, onAuthRequired } = this.$auth.options;

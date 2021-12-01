@@ -2,10 +2,13 @@
 
 # 5.0.2
 
-### Other
+### Bug Fixes
 
-[#73](https://github.com/okta/okta-vue/pull/73) Requires @okta/okta-auth-js ^5.3.1
+- [77](https://github.com/okta/okta-vue/pull/77) Fix issue with `navigationGuard` by starting `oktaAuth` service after handling login redirect
 
+### Others
+
+- [#77](https://github.com/okta/okta-vue/pull/77) Requires @okta/okta-auth-js ^5.8.0
 
 # 5.0.1
 
