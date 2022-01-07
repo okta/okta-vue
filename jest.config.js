@@ -13,6 +13,7 @@ module.exports = {
   ],
   globals: {
     'PACKAGE': ENV.packageInfo,
+    'AUTH_JS': { minSupportedVersion: '5.3.1' },
     'ts-jest': {
       diagnostics: {
         warnOnly: true

@@ -13,6 +13,7 @@
 import { App } from 'vue'
 import { Router, RouteLocationNormalized } from 'vue-router'
 import { AuthSdkError, OktaAuth, AuthState, toRelativeUrl } from '@okta/okta-auth-js'
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import semverCompare from 'semver-compare';
 import { OktaVueOptions, OnAuthRequiredFunction } from './types'
