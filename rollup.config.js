@@ -3,6 +3,7 @@ import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser'
 import cleanup from 'rollup-plugin-cleanup'
 import typescript from 'rollup-plugin-typescript2'
+import commonjs from '@rollup/plugin-commonjs'
 import pkg from './package.json'
 
 const ENV = require('./env')()
@@ -23,9 +24,12 @@ const makeExternalPredicate = externalArr => {
 const input = 'src/index.ts'
 
 const commonPlugins = [
+  commonjs(),
   replace({
     PACKAGE: JSON.stringify(ENV.packageInfo),
-    'process.env.AUTH_JS_MAJOR_VERSION': JSON.stringify(process.env.AUTH_JS_MAJOR_VERSION)
+    AUTH_JS: JSON.stringify({
+      minSupportedVersion: '5.3.1'
+    })
   }),
   cleanup()
 ]
