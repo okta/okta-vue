@@ -13,9 +13,7 @@
 import { App } from 'vue'
 import { Router, RouteLocationNormalized } from 'vue-router'
 import { AuthSdkError, OktaAuth, AuthState, toRelativeUrl } from '@okta/okta-auth-js'
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
-import semverCompare from 'semver-compare';
+import { compare } from 'compare-versions';
 import { OktaVueOptions, OnAuthRequiredFunction } from './types'
 
 // constants are defined in webpack.config.js
@@ -83,7 +81,7 @@ function install (app: App, {
   _oktaAuth = oktaAuth
   _onAuthRequired = onAuthRequired
 
-  const isAuthJsSupported = oktaAuth._oktaUserAgent && [0, 1].includes(semverCompare(oktaAuth._oktaUserAgent.getVersion(), AUTH_JS.minSupportedVersion));
+  const isAuthJsSupported = oktaAuth._oktaUserAgent && compare(oktaAuth._oktaUserAgent.getVersion(), AUTH_JS.minSupportedVersion, '>=');
   if (!isAuthJsSupported) {
     throw new AuthSdkError(`
     Passed in oktaAuth is not compatible with the SDK,

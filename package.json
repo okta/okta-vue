@@ -37,7 +37,8 @@
   },
   "homepage": "https://github.com/okta/okta-vue#readme",
   "dependencies": {
-    "@babel/runtime": "^7.12.5"
+    "@babel/runtime": "^7.12.5",
+    "compare-versions": "^4.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -77,7 +78,6 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.29.0",
     "rollup-plugin-vue": "^6.0.0-beta.11",
-    "semver-compare": "^1.0.0",
     "shelljs": "0.8.3",
     "ts-jest": "^26.4.4",
     "typescript": "^4.1.2",
