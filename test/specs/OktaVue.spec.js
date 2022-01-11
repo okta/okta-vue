@@ -22,6 +22,7 @@ describe('OktaVue', () => {
   let oktaAuth
   let wrapper
   let mockRouter
+  let originalConsole
 
   function setupOktaAuth () {
     oktaAuth = new OktaAuth({
@@ -48,7 +49,15 @@ describe('OktaVue', () => {
   }
 
   beforeEach(() => {
+    originalConsole = global.console
+    global.console = {
+      warn: jest.fn()
+    }
     setupOktaAuth()
+  })
+
+  afterEach(() => {
+    global.console = originalConsole
   })
 
   it('should add environment to oktaAuth\'s _oktaUserAgent', () => {
@@ -72,6 +81,12 @@ describe('OktaVue', () => {
     oktaAuth._oktaUserAgent.getVersion = jest.fn().mockReturnValue('1.0.0');
     expect(() => bootstrap()).toThrow(AuthSdkError);
   })
+
+  it('logs warning when oktaAuth._oktaUserAgent is not available', () => {
+    delete oktaAuth._oktaUserAgent;
+    bootstrap();
+    expect(global.console.warn).toHaveBeenCalledWith('_oktaUserAgent is not available on auth SDK instance. Please use okta-auth-js@^5.3.1 .');
+  });
 
   describe('restoreOriginalUri', () => {
     const mockOriginalUri = 'http://localhost/fakepath'

@@ -81,16 +81,21 @@ function install (app: App, {
   _oktaAuth = oktaAuth
   _onAuthRequired = onAuthRequired
 
-  const isAuthJsSupported = oktaAuth._oktaUserAgent && compare(oktaAuth._oktaUserAgent.getVersion(), AUTH_JS.minSupportedVersion, '>=');
-  if (!isAuthJsSupported) {
-    throw new AuthSdkError(`
-    Passed in oktaAuth is not compatible with the SDK,
-    minimum supported okta-auth-js version is ${AUTH_JS.minSupportedVersion}.
-  `);
-  }
+  if (oktaAuth._oktaUserAgent) {
+    const isAuthJsSupported = compare(oktaAuth._oktaUserAgent.getVersion(), AUTH_JS.minSupportedVersion, '>=');
+    if (!isAuthJsSupported) {
+      throw new AuthSdkError(`
+      Passed in oktaAuth is not compatible with the SDK,
+      minimum supported okta-auth-js version is ${AUTH_JS.minSupportedVersion}.
+    `);
+    }
 
-  // customize user agent
-  oktaAuth._oktaUserAgent.addEnvironment(`${PACKAGE.name}/${PACKAGE.version}`);
+    // customize user agent
+    oktaAuth._oktaUserAgent.addEnvironment(`${PACKAGE.name}/${PACKAGE.version}`);
+  } else {
+    // TODO: just throw based on the minimum supported auth-js version in the next major version
+    console.warn('_oktaUserAgent is not available on auth SDK instance. Please use okta-auth-js@^5.3.1 .');
+  }
 
   // add default restoreOriginalUri callback
   if (!oktaAuth.options.restoreOriginalUri) {
