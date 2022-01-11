@@ -13,12 +13,17 @@
 import { App } from 'vue'
 import { Router, RouteLocationNormalized } from 'vue-router'
 import { AuthSdkError, OktaAuth, AuthState, toRelativeUrl } from '@okta/okta-auth-js'
+import { compare } from 'compare-versions';
 import { OktaVueOptions, OnAuthRequiredFunction } from './types'
 
 // constants are defined in webpack.config.js
 declare const PACKAGE: {
   name: string;
   version: string;
+}
+
+declare const AUTH_JS: {
+  minSupportedVersion: string;
 }
 
 let _oktaAuth: OktaAuth
@@ -77,19 +82,18 @@ function install (app: App, {
   _onAuthRequired = onAuthRequired
 
   if (oktaAuth._oktaUserAgent) {
-    // check major version of auth-js
-    const oktaAuthVersion = oktaAuth._oktaUserAgent.getVersion();
-    const oktaAuthMajorVersion = oktaAuthVersion?.split('.')[0];
-    if (oktaAuthMajorVersion && oktaAuthMajorVersion !== process.env.AUTH_JS_MAJOR_VERSION) {
+    const isAuthJsSupported = compare(oktaAuth._oktaUserAgent.getVersion(), AUTH_JS.minSupportedVersion, '>=');
+    if (!isAuthJsSupported) {
       throw new AuthSdkError(`
-        Passed in oktaAuth is not compatible with the SDK,
-        okta-auth-js version ${process.env.AUTH_JS_MAJOR_VERSION}.x is the current supported version.
-      `);
+      Passed in oktaAuth is not compatible with the SDK,
+      minimum supported okta-auth-js version is ${AUTH_JS.minSupportedVersion}.
+    `);
     }
 
     // customize user agent
     oktaAuth._oktaUserAgent.addEnvironment(`${PACKAGE.name}/${PACKAGE.version}`);
   } else {
+    // TODO: just throw based on the minimum supported auth-js version in the next major version
     console.warn('_oktaUserAgent is not available on auth SDK instance. Please use okta-auth-js@^5.3.1 .');
   }
 
