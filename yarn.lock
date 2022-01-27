@@ -1211,27 +1211,6 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@okta/okta-auth-js@^5.8.0":
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/@okta/okta-auth-js/-/okta-auth-js-5.8.0.tgz#e80a550e7850f3bc89ea3d6bcd6a66a95f8702f5"
-  integrity sha512-gkQ3/IOlG10FsE7h3GCN38BJGv7QZqr8clh5dpmjmZ4L1xtFwoDuk1VP0iaHtxr3UhsOG/wxNx17tnFAuSjeoQ==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@okta/okta-idx-js" "0.22.0"
-    "@peculiar/webcrypto" "1.1.6"
-    Base64 "1.1.0"
-    atob "^2.1.2"
-    btoa "^1.2.1"
-    core-js "^3.6.5"
-    cross-fetch "^3.0.6"
-    js-cookie "2.2.1"
-    node-cache "^5.1.2"
-    p-cancelable "^2.0.0"
-    text-encoding "^0.7.0"
-    tiny-emitter "1.1.0"
-    webcrypto-shim "^0.1.5"
-    xhr2 "0.1.3"
-
 "@okta/okta-auth-js@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-auth-js/-/okta-auth-js-6.0.0.tgz#5ec34f7d92f6c91a3efeef8a6441175693b6fa74"
@@ -1253,16 +1232,6 @@
     webcrypto-shim "^0.1.5"
     xhr2 "0.1.3"
 
-"@okta/okta-idx-js@0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.22.0.tgz#c5dbebd155be2c8a8e2bbceb2e92701b6ba59349"
-  integrity sha512-SehJVwQI51xWrB1YaMn6UB54cOzhrM7z5k2xOI62I3B7qOQ3uFOZJvRCJnBcZ6TEcQuqJ3/6q93h6n8omw0tVQ==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@babel/runtime-corejs3" "^7.12.5"
-    core-js "^3.15.1"
-    jsonpath-plus "^5.1.0"
-
 "@okta/okta-idx-js@0.24.0":
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.24.0.tgz#f7c048a866add49f40fde0e25734fe61998be7c3"
@@ -1272,6 +1241,14 @@
     "@babel/runtime-corejs3" "^7.12.5"
     core-js "^3.15.1"
     jsonpath-plus "^5.1.0"
+
+"@okta/okta-vue@*":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-vue/-/okta-vue-5.1.1.tgz#904cfc48a30c316c0bc9c45e8efdf41f6b4c115f"
+  integrity sha512-7y7vqBuo1tD7W00yMKSYZqSwNzXFlEac+m+wthHQ3cE+4nSh/HfQxP0Arc7elYZKBUns/pVgRQPhv634K70jOA==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    compare-versions "^4.1.2"
 
 "@peculiar/asn1-schema@^2.0.27":
   version "2.0.36"
@@ -8039,9 +8016,9 @@ nan@^2.12.1:
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
 
 nanoid@^3.1.23:
-  version "3.1.23"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.23.tgz#f744086ce7c2bc47ee0a8472574d5c78e4183a81"
-  integrity sha512-FiB0kzdP0FFVGDKlRLEQ1BgDzU87dy5NnzjeW9YZNt+/c3+q82EQDUwniSAUxp/F0gFNI1ZhKU1FqYsMuqZVnw==
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.2.0.tgz#62667522da6673971cca916a6d3eff3f415ff80c"
+  integrity sha512-fmsZYa9lpn69Ad5eDn7FMcnnSR+8R34W9qJEijxYhTbfOWzr22n1QxCMzXLK+ODyW2973V3Fux959iQoUxzUIA==
 
 nanomatch@^1.2.9:
   version "1.2.13"
