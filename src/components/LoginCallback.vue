@@ -26,7 +26,8 @@ export default defineComponent({
       await this.$auth.handleLoginRedirect()
       this.$auth.start();
     } catch (e) {
-      if (this.$auth.isInteractionRequiredError(e)) {
+      const isInteractionRequiredError = this.$auth.isInteractionRequiredError || this.$auth.idx.isInteractionRequiredError;
+      if (isInteractionRequiredError(e)) {
         const { onAuthResume, onAuthRequired } = this.$auth.options;
         const callbackFn = onAuthResume || onAuthRequired;
         if (callbackFn) {

@@ -1,5 +1,13 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.1.1
+
+### Fixes
+
+- [#86](https://github.com/okta/okta-vue/pull/86) Fixes okta-auth-js v6 compatibility issues:
+  - allows okta-auth-js v6 in peerDependencies
+  - uses available `isInteractionRequiredError` method in `LoginCallback` component
+
 # 5.1.0
 
 ### Others
