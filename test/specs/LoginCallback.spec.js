@@ -120,7 +120,7 @@ describe('LoginCallback', () => {
       createOktaAuth()
       const error = new Error('interaction_required')
       jest.spyOn(oktaAuth, 'handleLoginRedirect').mockReturnValue(Promise.reject(error))
-      jest.spyOn(oktaAuth, 'isInteractionRequiredError').mockReturnValue(true);
+      jest.spyOn(oktaAuth.idx, 'isInteractionRequiredError').mockReturnValue(true);
     })
 
     it('calls onAuthResume', async () => {
