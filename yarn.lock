@@ -1211,27 +1211,6 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@okta/okta-auth-js@^5.8.0":
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/@okta/okta-auth-js/-/okta-auth-js-5.8.0.tgz#e80a550e7850f3bc89ea3d6bcd6a66a95f8702f5"
-  integrity sha512-gkQ3/IOlG10FsE7h3GCN38BJGv7QZqr8clh5dpmjmZ4L1xtFwoDuk1VP0iaHtxr3UhsOG/wxNx17tnFAuSjeoQ==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@okta/okta-idx-js" "0.22.0"
-    "@peculiar/webcrypto" "1.1.6"
-    Base64 "1.1.0"
-    atob "^2.1.2"
-    btoa "^1.2.1"
-    core-js "^3.6.5"
-    cross-fetch "^3.0.6"
-    js-cookie "2.2.1"
-    node-cache "^5.1.2"
-    p-cancelable "^2.0.0"
-    text-encoding "^0.7.0"
-    tiny-emitter "1.1.0"
-    webcrypto-shim "^0.1.5"
-    xhr2 "0.1.3"
-
 "@okta/okta-auth-js@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-auth-js/-/okta-auth-js-6.0.0.tgz#5ec34f7d92f6c91a3efeef8a6441175693b6fa74"
@@ -1253,16 +1232,6 @@
     webcrypto-shim "^0.1.5"
     xhr2 "0.1.3"
 
-"@okta/okta-idx-js@0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.22.0.tgz#c5dbebd155be2c8a8e2bbceb2e92701b6ba59349"
-  integrity sha512-SehJVwQI51xWrB1YaMn6UB54cOzhrM7z5k2xOI62I3B7qOQ3uFOZJvRCJnBcZ6TEcQuqJ3/6q93h6n8omw0tVQ==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@babel/runtime-corejs3" "^7.12.5"
-    core-js "^3.15.1"
-    jsonpath-plus "^5.1.0"
-
 "@okta/okta-idx-js@0.24.0":
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-idx-js/-/okta-idx-js-0.24.0.tgz#f7c048a866add49f40fde0e25734fe61998be7c3"
@@ -1272,6 +1241,14 @@
     "@babel/runtime-corejs3" "^7.12.5"
     core-js "^3.15.1"
     jsonpath-plus "^5.1.0"
+
+"@okta/okta-vue@*":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-vue/-/okta-vue-5.1.1.tgz#904cfc48a30c316c0bc9c45e8efdf41f6b4c115f"
+  integrity sha512-7y7vqBuo1tD7W00yMKSYZqSwNzXFlEac+m+wthHQ3cE+4nSh/HfQxP0Arc7elYZKBUns/pVgRQPhv634K70jOA==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    compare-versions "^4.1.2"
 
 "@peculiar/asn1-schema@^2.0.27":
   version "2.0.36"
@@ -5617,19 +5594,7 @@ glob@7.1.3:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.0.0, glob@^7.0.3, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
-  version "7.1.7"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.7.tgz#3b193e9233f01d42d0b3f78294bbeeb418f94a90"
-  integrity sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ==
-  dependencies:
-    fs.realpath "^1.0.0"
-    inflight "^1.0.4"
-    inherits "2"
-    minimatch "^3.0.4"
-    once "^1.3.0"
-    path-is-absolute "^1.0.0"
-
-glob@^7.1.7:
+glob@^7.0.0, glob@^7.0.3, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6, glob@^7.1.7:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.0.tgz#d15535af7732e02e948f4c41628bd910293f6023"
   integrity sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==
@@ -10237,10 +10202,10 @@ shell-quote@^1.6.1:
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
   integrity sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==
 
-shelljs@0.8.3:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.3.tgz#a7f3319520ebf09ee81275b2368adb286659b097"
-  integrity sha512-fc0BKlAWiLpwZljmOvAOTE/gXawtCoNrP5oaY7KIaQbbyHeQVg01pSEuEGvGh3HEdBU4baCD7wQBwADmM/7f7A==
+shelljs@0.8.5:
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.5.tgz#de055408d8361bed66c669d2f000538ced8ee20c"
+  integrity sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==
   dependencies:
     glob "^7.0.0"
     interpret "^1.0.0"
