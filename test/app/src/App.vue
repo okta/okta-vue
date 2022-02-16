@@ -4,7 +4,13 @@
     <button v-if='authState && authState.isAuthenticated' v-on:click='logout' id='logout-button'> Logout </button>
     <button v-else v-on:click='login' id='login-button'> Login </button>
     <router-link to="/protected" tag="button"> Protected </router-link>
-    <router-view/>
+    <router-view v-slot="{ Component }">
+      <component :is="Component">
+        <template #error="errorProps">
+          <p>Custom error: {{ errorProps.error }}</p>
+        </template>
+      </component>
+    </router-view>
   </div>
 </template>
 

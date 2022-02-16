@@ -15,7 +15,7 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { OktaAuth } from '@okta/okta-auth-js'
 import OktaVue, { LoginCallback } from '../../src'
-import { AppWithRoutes } from '../components'
+import { AppWithRoutes, AppWithRoutesAndSlots } from '../components'
 
 describe('LoginCallback', () => {
   let oktaAuth
@@ -44,7 +44,8 @@ describe('LoginCallback', () => {
       ]
     })
     const { onAuthRequired, onAuthResume } = options;
-    wrapper = mount(AppWithRoutes, {
+    const Comp = options.withCustomErrorSlot ? AppWithRoutesAndSlots : AppWithRoutes;
+    wrapper = mount(Comp, {
       global: {
         plugins: [
           router, 
@@ -113,6 +114,15 @@ describe('LoginCallback', () => {
     await navigateToCallback({ isLoginRedirect: true })
     await nextTick();
     expect(wrapper.text()).toBe('Error: my fake error')
+  })
+
+  it('shows errors with custom error slot', async () => {
+    createOktaAuth()
+    const error = new Error('my fake error')
+    jest.spyOn(oktaAuth, 'handleLoginRedirect').mockReturnValue(Promise.reject(error))
+    await navigateToCallback({ isLoginRedirect: true, withCustomErrorSlot: true })
+    await nextTick();
+    expect(wrapper.text()).toBe('Custom error: Error: my fake error')
   })
 
   describe('interaction code flow', () => {
