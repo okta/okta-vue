@@ -12,7 +12,7 @@
 
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, h } from 'vue'
 
 export default defineComponent({
   name: 'LoginCallback',
@@ -39,7 +39,11 @@ export default defineComponent({
     }
   },
   render() {
-    return this.error
+    if (this.$slots.error) {
+      return h('div', this.$slots.error({ error: this.error }));
+    }
+
+    return this.error;
   }
 })
 </script>

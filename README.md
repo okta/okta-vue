@@ -89,7 +89,7 @@ app.mount('#app')
 
 ### Use the LoginCallback Component
 
-In order to handle the redirect back from Okta, your app will need to read the values returned from Okta and exchange them for tokens. This SDK provides a [LoginCallback](#logincallback) component which calls [$auth.handleLoginRedirect](https://github.com/okta/okta-auth-js#handleloginredirecttokens) to perform this logic. If an error occurs, it will be displayed by the [LoginCallback](#logincallback) component. For custom behavior, the [LoginCallback component file](https://github.com/okta/okta-vue/blob/master/src/components/LoginCallback.vue) can be copied to your own source tree and modified as needed.
+In order to handle the redirect back from Okta, your app will need to read the values returned from Okta and exchange them for tokens. This SDK provides a [LoginCallback](#logincallback) component which calls [$auth.handleLoginRedirect](https://github.com/okta/okta-auth-js#handleloginredirecttokens) to perform this logic. If an error occurs, it will be displayed by the [LoginCallback](#logincallback) component, [named slot](https://vuejs.org/guide/components/slots.html#named-slots) (`error`) can be provided to customize the error rendering logic. For custom behavior, the [LoginCallback component file](https://github.com/okta/okta-vue/blob/master/src/components/LoginCallback.vue) can be copied to your own source tree and modified as needed.
 
 **Note:** Make sure you have the login redirect URI (as an absolute URL) listed in your Okta App's configuration in the Okta Admin console.
 

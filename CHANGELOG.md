@@ -1,5 +1,11 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.2.0
+
+### Features
+
+- [#89](https://github.com/okta/okta-vue/pull/89) Supports named slot (`error`) in `LoginCallback` component
+
 # 5.1.1
 
 ### Fixes
