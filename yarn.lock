@@ -1242,6 +1242,14 @@
     core-js "^3.15.1"
     jsonpath-plus "^5.1.0"
 
+"@okta/okta-vue@*":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-vue/-/okta-vue-5.2.0.tgz#d63a12a1a513b20df5d0e0a4abd062631e9b9b23"
+  integrity sha512-5DnNlzBA9UTryXmCPG4pF+TgWMbkWhdU10mlyYrBC1BQWjppwp0SnWG9NYFWvCx6j+tIXy1OSgc0HnTXYbMcgQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    compare-versions "^4.1.2"
+
 "@peculiar/asn1-schema@^2.0.27":
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.0.36.tgz#ca7978f43ffa4f35fbb74436c3f983c10a69ac27"
@@ -11368,9 +11376,9 @@ url-loader@^2.2.0:
     schema-utils "^2.5.0"
 
 url-parse@^1.4.3, url-parse@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.5.1.tgz#d5fa9890af8a5e1f274a2c98376510f6425f6e3b"
-  integrity sha512-HOfCOUJt7iSYzEx/UqgtwKRMC6EU91NFhsCHMv9oM03VJcVo2Qrp8T8kI9D7amFf1cu+/3CEhgb3rF9zL7k85Q==
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.5.10.tgz#9d3c2f736c1d75dd3bd2be507dcc111f1e2ea9c1"
+  integrity sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==
   dependencies:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
