@@ -1242,6 +1242,14 @@
     core-js "^3.15.1"
     jsonpath-plus "^5.1.0"
 
+"@okta/okta-vue@*":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-vue/-/okta-vue-5.2.0.tgz#d63a12a1a513b20df5d0e0a4abd062631e9b9b23"
+  integrity sha512-5DnNlzBA9UTryXmCPG4pF+TgWMbkWhdU10mlyYrBC1BQWjppwp0SnWG9NYFWvCx6j+tIXy1OSgc0HnTXYbMcgQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    compare-versions "^4.1.2"
+
 "@peculiar/asn1-schema@^2.0.27":
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.0.36.tgz#ca7978f43ffa4f35fbb74436c3f983c10a69ac27"
@@ -7855,9 +7863,9 @@ minimatch@3.0.4, minimatch@^3.0.4:
     brace-expansion "^1.1.7"
 
 minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
+  integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
 minipass@^3.1.1:
   version "3.1.3"
