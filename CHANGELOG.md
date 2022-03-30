@@ -1,5 +1,11 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.2.1
+
+### Others
+
+- [#93](https://github.com/okta/okta-vue/pull/93) Updates vulnerable dependencies
+
 # 5.2.0
 
 ### Features
