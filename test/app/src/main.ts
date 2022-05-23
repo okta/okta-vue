@@ -29,6 +29,7 @@ if (CONFIG.OKTA_TESTING_DISABLEHTTPSCHECK) {
 }
 
 const oktaAuth = new OktaAuth(config)
+oktaAuth.start()
 
 const app = createApp(App)
 app.use(router)

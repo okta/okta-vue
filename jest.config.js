@@ -36,5 +36,8 @@ module.exports = {
     '^.+\\.jsx?$': 'babel-jest',
     '.*\\.(vue)$': 'vue3-jest'
   },
-  testEnvironment: 'jsdom'
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: [
+    './test/jest.setup.js'
+  ],
 }

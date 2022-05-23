@@ -80,6 +80,7 @@ const oktaAuth = new OktaAuth({
   redirectUri: window.location.origin + '/login/callback',
   scopes: ['openid', 'profile', 'email']
 })
+oktaAuth.start()
 
 const app = createApp(App)
 app.use(OktaVue, { oktaAuth })
@@ -243,6 +244,7 @@ import OktaVue from '@okta/okta-vue'
 import router from './router'
 
 const oktaAuth = new OktaAuth(/* config */)
+oktaAuth.start()
 const app = createApp(App)
 app.use(router)
 app.use(OktaVue, { 

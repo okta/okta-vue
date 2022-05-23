@@ -164,4 +164,13 @@ describe('OktaVue', () => {
     expect(oktaAuth.authStateManager.unsubscribe).toHaveBeenCalledWith(wrapper.vm.$_oktaVue_handleAuthStateUpdate)
   })
 
+  it('should not call service start and stop', () => {
+    oktaAuth.start = jest.fn()
+    oktaAuth.stop = jest.fn()
+    bootstrap()
+    wrapper.unmount()
+    expect(oktaAuth.start).not.toHaveBeenCalled()
+    expect(oktaAuth.stop).not.toHaveBeenCalled()
+  })
+
 })

@@ -101,8 +101,8 @@ function install (app: App, {
   if (!oktaAuth.options.restoreOriginalUri) {
     oktaAuth.options.restoreOriginalUri = async (oktaAuth: OktaAuth, originalUri: string) => {
       // If a router is available, provide a default implementation
-      if (_router && originalUri) {
-        const path = toRelativeUrl(originalUri, window.location.origin)
+      if (_router) {
+        const path = toRelativeUrl(originalUri || '/', window.location.origin);
         _router.replace({ path })
       }
     }
@@ -121,15 +121,19 @@ function install (app: App, {
     created () {
       // subscribe to the latest authState
       oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-      if (!oktaAuth.token.isLoginRedirect()) {
-        // Calculates initial auth state and fires change event for listeners
-        // Also starts the token auto-renew service
-        oktaAuth.start();
+
+      // check that service has been started
+      const authState = oktaAuth.authStateManager.getAuthState();
+      if (!authState && !oktaAuth.isLoginRedirect() && !oktaAuth.authStateManager?._pending?.updateAuthStatePromise) {
+        // Service has NOT been started
+        // Need to trigger initial change event and notify user about `oktaAuth.start()`
+        // Signing out with `clearTokensBeforeRedirect` and background services will not work
+        oktaAuth.authStateManager.updateAuthState();
+        console.warn('OktaAuth service should be started outside of Security component.');
       }
     },
     beforeUnmount () {
       oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
-      oktaAuth.stop()
     },
     // private property naming convention follows
     // https://vuejs.org/v2/style-guide/#Private-property-names-essential

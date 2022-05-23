@@ -31,6 +31,7 @@ describe('OktaVue module', () => {
       template: '<div></div>'
     }
     const oktaAuth = new OktaAuth(baseConfig)
+    oktaAuth.start()
     const wrapper = mount(App, {
       global: {
         plugins: [
@@ -39,6 +40,7 @@ describe('OktaVue module', () => {
       }
     })
     expect(wrapper.vm.$auth instanceof OktaAuth).toBeTruthy()
+    oktaAuth.stop()
   })
   test('exports "LoginCallback" component', () => {
     expect(LoginCallback).toBe(InternalLoginCallback)

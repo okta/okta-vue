@@ -23,8 +23,7 @@ export default defineComponent({
   },
   async beforeMount () {
     try {
-      await this.$auth.handleLoginRedirect()
-      this.$auth.start();
+      await this.$auth.handleLoginRedirect();
     } catch (e) {
       const isInteractionRequiredError = this.$auth.isInteractionRequiredError || this.$auth.idx.isInteractionRequiredError;
       if (isInteractionRequiredError(e)) {
