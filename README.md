@@ -11,7 +11,7 @@
 [![npm version](https://img.shields.io/npm/v/@okta/okta-vue.svg?style=flat-square)](https://www.npmjs.com/package/@okta/okta-vue)
 [![build status](https://img.shields.io/travis/okta/okta-oidc-js/master.svg?style=flat-square)](https://travis-ci.org/okta/okta-vue)
 
-> Okta Vue version 4 is for Vue 3 and Vue Router 4. If you are looking for @okta/okta-vue@3.x which supports Vue 2, please checkout the [master branch](https://github.com/okta/okta-vue).
+> Okta Vue version 4+ is for Vue 3 and Vue Router 4. If you are looking for @okta/okta-vue@3.x which supports Vue 2, please checkout the [master branch](https://github.com/okta/okta-vue).
 
 Okta Vue SDK builds on top of the [Okta Auth SDK][]. This SDK integrates with the [vue-router][] and extends the [Vue prototype][] with an [Okta Auth SDK][] instance to help you quickly add authentication and authorization to your Vue single-page web application.
 
@@ -58,14 +58,15 @@ This library currently supports:
 This library is available through [npm](https://www.npmjs.com/package/@okta/okta-vue). To install it, simply add it to your project:
 
 ```bash
-npm install --save @okta/okta-vue@^4.0.0
+npm install --save @okta/okta-vue
 ```
 
 ### Configuration
 
 You will need the values from the OIDC client that you created in the previous step to instantiate the middleware. You will also need to know your Okta Org URL, which you can see on the home page of the Okta Developer console.
 
-In your application's [vue-router][] configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information:
+In your application's [vue-router][] configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information. 
+Don't forget to start [Okta Auth SDK][] instance.
 
 ```typescript
 // main.ts
@@ -308,6 +309,7 @@ import { OktaVueOptions } from '@okta/okta-vue'
 import { OktaAuth } from '@okta/okta-auth-js'
 
 const oktaAuth = new OktaAuth(/* configs */)
+oktaAuth.start()
 const options: OktaVueOptions = {
   oktaAuth
 }
