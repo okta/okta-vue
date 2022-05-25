@@ -108,6 +108,10 @@ function install (app: App, {
     }
   }
 
+  // Calculates initial auth state and fires change event for listeners
+  // Also starts services
+  oktaAuth.start();
+
   app.mixin({
     data () {
       return {
@@ -120,11 +124,8 @@ function install (app: App, {
     },
     created () {
       // subscribe to the latest authState
+      this.authState = oktaAuth.authStateManager.getAuthState()
       oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-
-      // Calculates initial auth state and fires change event for listeners
-      // Also starts services
-      oktaAuth.start();
     },
     beforeUnmount () {
       oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)

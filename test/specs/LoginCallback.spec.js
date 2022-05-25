@@ -29,10 +29,13 @@ describe('LoginCallback', () => {
     }, options));
   }
 
-  afterEach(() => {
-    oktaAuth?.stop()
+  beforeEach(() => {
     oktaAuth = null
     wrapper = null
+  })
+
+  afterEach(() => {
+    oktaAuth?.stop()
   })
 
   async function navigateToCallback (options = {}) {
@@ -74,13 +77,13 @@ describe('LoginCallback', () => {
     expect(oktaAuth.handleLoginRedirect).toHaveBeenCalled()
   })
 
-  it('does not start oktaAuth service on login redirect', async () => {
+  it('does not start oktaAuth service after login redirect', async () => {
     createOktaAuth()
     jest.spyOn(oktaAuth, 'handleLoginRedirect');
     jest.spyOn(oktaAuth, 'start');
     await navigateToCallback()
     expect(oktaAuth.handleLoginRedirect).toHaveBeenCalled()
-    expect(oktaAuth.start).not.toHaveBeenCalled()
+    expect(oktaAuth.start).toHaveBeenCalledTimes(1)
   })
 
   it('calls the default "restoreOriginalUri" options when in login redirect uri', async () => {
