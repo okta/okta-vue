@@ -27,7 +27,6 @@ describe('LoginCallback', () => {
       clientId: 'foo',
       redirectUri: 'https://foo'
     }, options));
-    oktaAuth.start();
   }
 
   afterEach(() => {

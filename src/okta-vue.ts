@@ -122,15 +122,9 @@ function install (app: App, {
       // subscribe to the latest authState
       oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
 
-      // check that service has been started
-      const authState = oktaAuth.authStateManager.getAuthState();
-      if (!authState && !oktaAuth.isLoginRedirect() && !oktaAuth.authStateManager?._pending?.updateAuthStatePromise) {
-        // Service has NOT been started
-        // Need to trigger initial change event and notify user about `oktaAuth.start()`
-        // Signing out with `clearTokensBeforeRedirect` and background services will not work
-        oktaAuth.authStateManager.updateAuthState();
-        console.warn('OktaAuth service should be started outside of Security component.');
-      }
+      // Calculates initial auth state and fires change event for listeners
+      // Also starts services
+      oktaAuth.start();
     },
     beforeUnmount () {
       oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)

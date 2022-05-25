@@ -65,8 +65,7 @@ npm install --save @okta/okta-vue
 
 You will need the values from the OIDC client that you created in the previous step to instantiate the middleware. You will also need to know your Okta Org URL, which you can see on the home page of the Okta Developer console.
 
-In your application's [vue-router][] configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information. 
-Don't forget to start [Okta Auth SDK][] instance.
+In your application's [vue-router][] configuration, import the `@okta/okta-vue` plugin and pass it your OpenID Connect client information:
 
 ```typescript
 // main.ts
@@ -81,7 +80,6 @@ const oktaAuth = new OktaAuth({
   redirectUri: window.location.origin + '/login/callback',
   scopes: ['openid', 'profile', 'email']
 })
-oktaAuth.start()
 
 const app = createApp(App)
 app.use(OktaVue, { oktaAuth })
@@ -245,7 +243,6 @@ import OktaVue from '@okta/okta-vue'
 import router from './router'
 
 const oktaAuth = new OktaAuth(/* config */)
-oktaAuth.start()
 const app = createApp(App)
 app.use(router)
 app.use(OktaVue, { 
@@ -309,7 +306,6 @@ import { OktaVueOptions } from '@okta/okta-vue'
 import { OktaAuth } from '@okta/okta-auth-js'
 
 const oktaAuth = new OktaAuth(/* configs */)
-oktaAuth.start()
 const options: OktaVueOptions = {
   oktaAuth
 }

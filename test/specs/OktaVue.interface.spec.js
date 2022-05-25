@@ -31,7 +31,6 @@ describe('OktaVue module', () => {
       template: '<div></div>'
     }
     const oktaAuth = new OktaAuth(baseConfig)
-    oktaAuth.start()
     const wrapper = mount(App, {
       global: {
         plugins: [
