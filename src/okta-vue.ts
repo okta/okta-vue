@@ -101,12 +101,16 @@ function install (app: App, {
   if (!oktaAuth.options.restoreOriginalUri) {
     oktaAuth.options.restoreOriginalUri = async (oktaAuth: OktaAuth, originalUri: string) => {
       // If a router is available, provide a default implementation
-      if (_router && originalUri) {
-        const path = toRelativeUrl(originalUri, window.location.origin)
+      if (_router) {
+        const path = toRelativeUrl(originalUri || '/', window.location.origin);
         _router.replace({ path })
       }
     }
   }
+
+  // Calculates initial auth state and fires change event for listeners
+  // Also starts services
+  oktaAuth.start();
 
   app.mixin({
     data () {
@@ -120,16 +124,11 @@ function install (app: App, {
     },
     created () {
       // subscribe to the latest authState
+      this.authState = oktaAuth.authStateManager.getAuthState()
       oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-      if (!oktaAuth.token.isLoginRedirect()) {
-        // Calculates initial auth state and fires change event for listeners
-        // Also starts the token auto-renew service
-        oktaAuth.start();
-      }
     },
     beforeUnmount () {
       oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
-      oktaAuth.stop()
     },
     // private property naming convention follows
     // https://vuejs.org/v2/style-guide/#Private-property-names-essential

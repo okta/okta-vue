@@ -1,5 +1,13 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.3.0
+
+### Others
+
+- [#96](https://github.com/okta/okta-vue/pull/96)
+  - Removes `oktaAuth.stop()` from `OktaVue` module
+  - Removes `oktaAuth.start()` from `LoginCallback` component
+
 # 5.2.1
 
 ### Others
