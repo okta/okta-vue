@@ -176,6 +176,35 @@ export default defineComponent({
 </script>
 ```
 
+If you are using setup function or setup script, you can access the oktaAuth instance with `useAuth` composable.
+
+```typescript
+// src/App.vue
+
+<template>
+  <div id="app">
+    <router-link to="/" tag="button" id='home-button'> Home </router-link>
+    <button v-if='authState && authState.isAuthenticated' v-on:click='logout' id='logout-button'> Logout </button>
+    <button v-else v-on:click='login' id='login-button'> Login </button>
+    <router-view/>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useAuth } from '@okta/okta-vue';
+
+const auth = useAuth();
+
+const login = async () => {
+  await auth.signInWithRedirect()
+}
+
+const logout = async () => {
+  await auth.signOut()
+}
+</script>
+```
+
 ### Use the Access Token
 
 When your users are authenticated, your Vue application has an access token that was issued by your Okta Authorization server. You can use this token to authenticate requests for resources on your server or API. As a hypothetical example, let's say you have an API that provides messages for a user. You could create a `MessageList` component that gets the access token and uses it to make an authenticated request to your server.
