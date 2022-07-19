@@ -12,7 +12,7 @@
 
 import { mount } from '@vue/test-utils'
 import { OktaAuth } from '@okta/okta-auth-js'
-import OktaVue, { LoginCallback, navigationGuard } from '../../src'
+import OktaVue, { LoginCallback, navigationGuard, useAuth } from '../../src'
 import InternalLoginCallback from '../../src/components/LoginCallback'
 import { navigationGuard as internalNavigationGuard } from '../../src/okta-vue'
 
@@ -39,6 +39,8 @@ describe('OktaVue module', () => {
       }
     })
     expect(wrapper.vm.$auth instanceof OktaAuth).toBeTruthy()
+    const auth = useAuth()
+    expect(wrapper.vm.$auth).toBe(auth)
   })
   test('exports "LoginCallback" component', () => {
     expect(LoginCallback).toBe(InternalLoginCallback)

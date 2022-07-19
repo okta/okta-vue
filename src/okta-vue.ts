@@ -150,4 +150,12 @@ function install (app: App, {
   app.config.globalProperties.$auth = oktaAuth
 }
 
+export function useAuth() {
+  if (!_oktaAuth) {
+    throw new AuthSdkError('No oktaAuth instance has instantiated.')
+  }
+
+  return _oktaAuth
+}
+
 export default { install }
