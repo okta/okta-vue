@@ -91,8 +91,9 @@
     "webdriver-manager": "^12.1.8"
   },
   "resolutions": {
-    "qs": "6.10.3",
-    "ejs": "3.1.8"
+    "**/request/qs": "^6.10.3",
+    "**/nightwatch/ejs": "^3.1.8",
+    "**/wait-on/axios": "^0.27.2"
   },
   "jest-junit": {
     "outputDirectory": "./test-reports/unit/",
