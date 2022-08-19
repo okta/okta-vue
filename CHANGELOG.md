@@ -1,5 +1,11 @@
 [authState]: https://github.com/okta/okta-auth-js#authstatemanager
 
+# 5.4.0
+
+### Features
+
+- [#106](https://github.com/okta/okta-vue/pull/106) Adds composable `useAuth()` to access the oktaAuth instance in setup script
+
 # 5.3.0
 
 ### Others
