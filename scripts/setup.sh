@@ -88,7 +88,7 @@ if [ ! -z "$AUTHJS_VERSION" ]; then
     exit ${FAILED_SETUP}
   fi
 
-  if [ $(echo $INSTALLED_VERSIONS | jq .[0]) != $AUTHJS_VERSION ]
+  if [ $(echo $INSTALLED_VERSIONS | jq .[0]) != "${AUTHJS_VERSION}" ]
   then
     echo "ADDITIONAL AUTH JS INSTALL DETECTED (check 3)"
     yarn why @okta/okta-auth-js
