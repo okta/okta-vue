@@ -73,10 +73,30 @@ if [ ! -z "$AUTHJS_VERSION" ]; then
   AUTHJS_INSTALLS=$(find . -type d -path "*/node_modules/@okta/okta-auth-js" -not -path "*/okta-signin-widget/*" | wc -l)
   if [ $AUTHJS_INSTALLS -gt 1 ]
   then
-    echo "ADDITIONAL AUTH JS INSTALL DETECTED"
+    echo "ADDITIONAL AUTH JS INSTALL DETECTED (check 1)"
     yarn why @okta/okta-auth-js
     exit ${FAILED_SETUP}
   fi
+
+  # parses `yarn why` output to generate an json array of installed versions
+  INSTALLED_VERSIONS=$(yarn why --json @okta/okta-auth-js | jq -r -s 'map(select(.type == "info") | select(.data | strings | contains("Found"))) | map(.data[11:-1] | select(contains("okta-signin-widget") | not)) | map(split("@")[-1]) | unique')
+
+  if [ $(echo $INSTALLED_VERSIONS | jq length) -ne 1 ]
+  then
+    then
+    echo "ADDITIONAL AUTH JS INSTALL DETECTED (check 2)"
+    yarn why @okta/okta-auth-js
+    exit ${FAILED_SETUP}
+  fi
+
+  if [ $(echo $INSTALLED_VERSIONS | jq .[0]) != $AUTHJS_VERSION ]
+  then
+    then
+    echo "ADDITIONAL AUTH JS INSTALL DETECTED (check 3)"
+    yarn why @okta/okta-auth-js
+    exit ${FAILED_SETUP}
+  fi
+
 fi
 
 # build okta-vue
