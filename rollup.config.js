@@ -26,10 +26,13 @@ const input = 'src/index.ts'
 const commonPlugins = [
   commonjs(),
   replace({
-    PACKAGE: JSON.stringify(ENV.packageInfo),
-    AUTH_JS: JSON.stringify({
-      minSupportedVersion: '5.3.1'
-    })
+    values: {
+      PACKAGE: JSON.stringify(ENV.packageInfo),
+      AUTH_JS: JSON.stringify({
+        minSupportedVersion: '5.3.1'
+      })
+    },
+    preventAssignment: true
   }),
   cleanup()
 ]
@@ -55,7 +58,8 @@ export default [
       exports: 'named',
       globals: {
         '@okta/okta-auth-js': 'OktaAuth',
-        'vue': 'Vue'
+        'vue': 'Vue',
+        'compare-versions': 'compareVersions'
       }
     }
   },
