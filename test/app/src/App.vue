@@ -7,7 +7,7 @@
     <router-view v-slot="{ Component }">
       <component :is="Component">
         <template #error="errorProps">
-          <p>Custom error: {{ errorProps.error }}</p>
+          <p v-if='errorProps.error'>Custom error: {{ errorProps.error }}</p>
         </template>
       </component>
     </router-view>
