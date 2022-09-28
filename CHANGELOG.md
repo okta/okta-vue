@@ -1,4 +1,8 @@
-[authState]: https://github.com/okta/okta-auth-js#authstatemanager
+# 5.5.0
+
+### Features
+- [#110](https://github.com/okta/okta-vue/pull/110) Adds support for `@okta/okta-auth-js` `7.x`
+  - bumps minimum node version to `14`
 
 # 5.4.0
 
