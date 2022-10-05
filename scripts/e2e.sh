@@ -17,7 +17,7 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 # sh ~/okta/okta-vue/scripts/update_se_drivers.sh
 # cd ~/okta/okta-vue/test/e2e
 
-if ! yarn e2e; then
+if ! yarn test:e2e; then
   echo "e2e tests failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
