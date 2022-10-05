@@ -19,7 +19,7 @@ class ProtectedPage {
   get logoutButton () { return $('#logout-button'); }
   get userInfo () { return $('#userinfo-container'); }
 
-  waitForPageLoad(path) {
+  waitForPageLoad(path='') {
     return browser.waitUntil(async () => {
       const url = await browser.getUrl();
       return url.indexOf('/protected' + path) !== -1;

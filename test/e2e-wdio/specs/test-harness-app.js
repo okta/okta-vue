@@ -24,8 +24,6 @@ if (process.env.ORG_OIE_ENABLED) {
   OktaSignInPage = OktaSignInPageOIE;
 }
 
-//TODO:
-// this.config ???
 const { USERNAME, PASSWORD } = process.env;
 
 describe('Vue + Okta App', () => {
@@ -37,7 +35,7 @@ describe('Vue + Okta App', () => {
       await OktaSignInPage.waitForPageLoad();
       await OktaSignInPage.login(USERNAME, PASSWORD);
 
-      await ProtectedPage.waitForPageLoad('?state=bar#baz');
+      await ProtectedPage.waitForPageLoad();
       expect(await ProtectedPage.logoutButton.isExisting()).toBeTruthy();
 
       await ProtectedPage.userInfo.waitForDisplayed();
@@ -57,7 +55,7 @@ describe('Vue + Okta App', () => {
       await OktaSignInPage.waitForPageLoad();
       await OktaSignInPage.login(USERNAME, PASSWORD);
   
-      await HomePage.waitForPageLoad();
+      await HomePage.logoutButton.waitForDisplayed({timeout: 20000});
       expect(await HomePage.logoutButton.isExisting()).toBeTruthy();
   
       await HomePage.logoutButton.click();
@@ -74,7 +72,7 @@ describe('Vue + Okta App', () => {
       await SessionTokenPage.waitForPageLoad();
       await SessionTokenPage.login(USERNAME, PASSWORD);
 
-      await HomePage.waitForPageLoad();
+      await HomePage.logoutButton.waitForDisplayed({timeout: 20000});
       expect(await HomePage.logoutButton.isExisting()).toBeTruthy();
 
       // Logout

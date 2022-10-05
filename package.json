@@ -89,6 +89,11 @@
     "wait-for-expect": "^3.0.0",
     "webdriver-manager": "^12.1.8"
   },
+  "peerDependencies": {
+    "@okta/okta-auth-js": "^5.8.0 || ^6.0.0 || ^7.0.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.3"
+  },
   "resolutions": {
     "**/request/qs": "^6.10.3",
     "**/wait-on/axios": "^0.27.2"
@@ -106,16 +111,16 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "workspaces": [
-    "./",
-    "test/apps/*",
-    "test/e2e",
-    "test/e2e-wdio",
-    "env"
-  ],
-  "peerDependencies": {
-    "@okta/okta-auth-js": "^5.8.0 || ^6.0.0 || ^7.0.0",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.3"
+  "workspaces": {
+    "packages": [
+      "./",
+      "test/apps/*",
+      "test/e2e",
+      "test/e2e-wdio",
+      "env"
+    ],
+    "nohoist": [
+      "**/@wdio/**"
+    ]
   }
 }
