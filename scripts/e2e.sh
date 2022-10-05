@@ -14,8 +14,8 @@ export SPA_CLIENT_ID=0oapmwm72082GXal14x6
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 
-sh ~/okta/okta-vue/scripts/update_se_drivers.sh
-cd ~/okta/okta-vue/test/e2e
+# sh ~/okta/okta-vue/scripts/update_se_drivers.sh
+# cd ~/okta/okta-vue/test/e2e
 
 if ! yarn e2e; then
   echo "e2e tests failed! Exiting..."
