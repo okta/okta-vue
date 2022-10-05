@@ -10,7 +10,6 @@ const env = {};
   'ISSUER',
   'CLIENT_ID',
   'OKTA_TESTING_DISABLEHTTPSCHECK',
-  'USE_INTERACTION_CODE',
 ].forEach((key) => {
   if (!process.env[key]) {
     throw new Error(`Environment variable ${key} must be set. See README.md`);
