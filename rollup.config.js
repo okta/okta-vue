@@ -6,7 +6,10 @@ import typescript from 'rollup-plugin-typescript2'
 import commonjs from '@rollup/plugin-commonjs'
 import pkg from './package.json'
 
-const ENV = require('./env')()
+const packageInfo = {
+  name: pkg.name,
+  version: pkg.version
+};
 
 const external = [
   ...Object.keys(pkg.peerDependencies || {}),
@@ -27,7 +30,7 @@ const commonPlugins = [
   commonjs(),
   replace({
     values: {
-      PACKAGE: JSON.stringify(ENV.packageInfo),
+      PACKAGE: JSON.stringify(packageInfo),
       AUTH_JS: JSON.stringify({
         minSupportedVersion: '5.3.1'
       })

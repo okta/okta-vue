@@ -18,7 +18,7 @@
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start",
     "test": "yarn lint && yarn test:unit",
-    "test:e2e": "yarn --cwd test/e2e start",
+    "test:e2e": "yarn workspace @okta/test.e2e-wdio test",
     "test:unit": "jest",
     "bundle": "rollup -c rollup.config.js",
     "dev": "yarn bundle --watch"
@@ -57,7 +57,6 @@
     "babel-eslint": "^7.1.1",
     "babel-jest": "^27.5.1",
     "chalk": "2.4.2",
-    "dotenv": "^8.1.0",
     "eslint": "^7.15.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-friendly-formatter": "^3.0.0",
@@ -109,8 +108,10 @@
   ],
   "workspaces": [
     "./",
-    "test/app",
-    "test/e2e"
+    "test/apps/*",
+    "test/e2e",
+    "test/e2e-wdio",
+    "env"
   ],
   "peerDependencies": {
     "@okta/okta-auth-js": "^5.8.0 || ^6.0.0 || ^7.0.0",
