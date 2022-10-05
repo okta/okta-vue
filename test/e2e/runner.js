@@ -1,49 +1,118 @@
-/* eslint-disable no-console */
-const spawn = require('cross-spawn-with-kill')
-const waitOn = require('wait-on')
+/*!
+ * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
+ * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
+ *
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
 
-// 1. start the dev server
-const server = spawn('yarn', [
-  '--cwd',
-  '../app',
-  'start'
-], { stdio: 'inherit' })
+const spawn = require('cross-spawn-with-kill');
+const waitOn = require('wait-on');
+const path = require('path');
 
-waitOn({
-  resources: [
-    'http-get://localhost:8080'
-  ]
-}).then(() => {
-  // 2. run the nightwatch test suite against it
-  // to run in additional browsers:
-  //    1. add an entry in test/e2e/nightwatch.conf.json under "test_settings"
-  //    2. add it to the --env flag below
-  // or override the environment flag, for example: `npm run e2e -- --env chrome,firefox`
-  // For more information on Nightwatch's config file, see
-  // http://nightwatchjs.org/guide#settings-file
-  let opts = process.argv.slice(2)
-  if (opts.indexOf('--config') === -1) {
-    opts = opts.concat(['--config', 'nightwatch.conf.js'])
+require('@okta/env').setEnvironmentVarsFromTestEnv();
+
+// TODO: remove default when multiple test apps are added
+const testName = process.env.SAMPLE_NAME || 'harness';
+
+// eslint-disable-next-line no-unused-vars
+function runNextTask(tasks) {
+  if (tasks.length === 0) {
+    console.log('all runs are complete');
+    return;
   }
-  if (opts.indexOf('--env') === -1) {
-    opts = opts.concat(['--env', 'chrome'])
+  const task = tasks.shift();
+  task().then(() => {
+    runNextTask(tasks);
+  });
+}
+
+function runWithConfig(config) {
+  return new Promise((resolve) => {
+    const { name } = config;
+    const port = config.port || 8080;
+
+    // 1. start the sample's web server
+    const server = spawn('yarn', [
+      'workspace',
+      name,
+      'start'
+    ], { stdio: 'inherit' });
+
+    waitOn({
+      resources: [
+        `http-get://localhost:${port}`
+      ]
+    }).then(() => {
+      // 2. run webdriver based on if sauce is needed or not
+      // TODO: support saucelab and cucumber
+      const wdioConfig = path.resolve(__dirname, 'wdio.conf.js');
+      const specs = config.specs.reduce(
+        (acc, spec) => [...acc, '--spec', path.join(__dirname, 'specs', spec)]
+      , []);
+      const args = ['wdio', 'run', wdioConfig, ...specs];
+      const env = Object.assign({}, process.env, {APP_NAME: name});
+      const runner = spawn('yarn', args, { stdio: 'inherit', env });
+
+      let returnCode = 1;
+      runner.on('exit', function (code) {
+        console.log('Test runner exited with code: ', code);
+        returnCode = code;
+        server.kill();
+      });
+      runner.on('error', function (err) {
+        server.kill();
+        throw err;
+      });
+      server.on('exit', function(code) {
+        console.log('Server exited with code: ', code);
+        resolve(returnCode);
+      });
+    });
+  })
+}
+
+function runHarnessTests () {
+  const config = {
+    name: '@okta/test.harness.app',
+    specs: ['test-harness-app'],
+    port: 8080
   }
 
-  const runner = spawn('./node_modules/.bin/nightwatch', opts, { stdio: 'inherit' })
+  return runWithConfig(config);
+}
 
-  let returnCode = 1
-  runner.on('exit', function (code) {
-    console.log('Test runner exited with code: ' + code)
-    returnCode = code
-    server.kill()
-  })
-  runner.on('error', function (err) {
-    server.kill()
-    throw err
-  })
-  server.on('exit', function (code) {
-    console.log('Server exited with code: ' + code)
-    // eslint-disable-next-line no-process-exit
-    process.exit(returnCode)
-  })
-})
+if (testName) {
+  console.log(`Running starting for test "${testName}"`);
+
+  if (testName === 'harness') {
+    runHarnessTests();
+  }
+  else {
+    // TODO: this repo only has a single test app
+    // const sampleConfig = samplesConfig.find(config => config.name === testName);
+    // if (!samplesConfig) {
+    //   throw new Error(`Failed to find sample config with ${testName} `);
+    // }
+    // console.log('Starting test with config: ', sampleConfig);
+    // runWithConfig(sampleConfig);
+  }
+} else {
+  // TODO: this repo only has a single test app
+  // // Run all tests
+  // const tasks = samplesConfig.map((sampleConfig) => {
+  //   const specs = sampleConfig.specs || [];
+  //   if (!specs.length) {
+  //     return;
+  //   }
+  //   // return taskFn.bind(null, sampleConfig);
+  //   return runWithConfig.bind(null, sampleConfig);
+  // })
+  // .filter((task) => typeof task === 'function');
+
+  // runNextTask([runHarnessTests, ...tasks]);
+}

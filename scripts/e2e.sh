@@ -2,22 +2,17 @@
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
-#setup_service xvfb start
 setup_service java 1.8.222
 setup_service google-chrome-stable 89.0.4389.72-1
 
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/test-reports/e2e"
 
+export CI=true
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
 export SPA_CLIENT_ID=0oapmwm72082GXal14x6
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
-
-export CI=true
-
-# sh ~/okta/okta-vue/scripts/update_se_drivers.sh
-# cd ~/okta/okta-vue/test/e2e
 
 if ! yarn test:e2e; then
   echo "e2e tests failed! Exiting..."
