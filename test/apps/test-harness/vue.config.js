@@ -1,6 +1,7 @@
 require('@okta/env').setEnvironmentVarsFromTestEnv();
 
 process.env.CLIENT_ID = process.env.SPA_CLIENT_ID || process.env.CLIENT_ID;
+process.env.OKTA_TESTING_DISABLEHTTPSCHECK = process.env.OKTA_TESTING_DISABLEHTTPSCHECK || false;
 
 const env = {};
 
