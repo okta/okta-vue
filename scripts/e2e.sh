@@ -3,7 +3,7 @@
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 setup_service java 1.8.222
-setup_service google-chrome-stable 105.0.5195.19-1
+setup_service google-chrome-stable 106.0.5249.91-1
 
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/test-reports/e2e"
