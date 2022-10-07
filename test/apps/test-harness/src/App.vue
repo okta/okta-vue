@@ -1,9 +1,9 @@
 <template>
-  <div id="app">
+  <div id="test-app">
     <router-link to="/" tag="button" id='home-button'> Home </router-link>
     <button v-if='authState && authState.isAuthenticated' v-on:click='logout' id='logout-button'> Logout </button>
     <button v-else v-on:click='login' id='login-button'> Login </button>
-    <router-link to="/protected" tag="button"> Protected </router-link>
+    <router-link id="protected-link" to="/protected" tag="button"> Protected </router-link>
     <router-view v-slot="{ Component }">
       <component :is="Component">
         <template #error="errorProps">

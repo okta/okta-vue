@@ -1,4 +1,9 @@
-var ENV = require('./env')()
+const pkg = require('./package.json');
+
+const packageInfo = {
+  name: pkg.name,
+  version: pkg.version
+};
 
 module.exports = {
   coverageDirectory: '<rootDir>/test-reports/unit',
@@ -12,7 +17,7 @@ module.exports = {
     'jest-junit'
   ],
   globals: {
-    'PACKAGE': ENV.packageInfo,
+    'PACKAGE': packageInfo,
     'AUTH_JS': { minSupportedVersion: '5.3.1' },
     'ts-jest': {
       diagnostics: {

@@ -18,7 +18,7 @@
     "prepare": "yarn build",
     "start": "yarn --cwd test/app start",
     "test": "yarn lint && yarn test:unit",
-    "test:e2e": "yarn --cwd test/e2e start",
+    "test:e2e": "yarn workspace @okta/test.e2e-wdio test",
     "test:unit": "jest",
     "bundle": "rollup -c rollup.config.js",
     "dev": "yarn bundle --watch"
@@ -41,9 +41,9 @@
     "compare-versions": "^4.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/plugin-transform-runtime": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
+    "@babel/core": "^7.19.3",
+    "@babel/plugin-transform-runtime": "^7.19.1",
+    "@babel/preset-env": "^7.19.3",
     "@okta/okta-auth-js": "^7.0.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-commonjs": "^21.0.1",
@@ -57,7 +57,6 @@
     "babel-eslint": "^7.1.1",
     "babel-jest": "^27.5.1",
     "chalk": "2.4.2",
-    "dotenv": "^8.1.0",
     "eslint": "^7.15.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-friendly-formatter": "^3.0.0",
@@ -90,6 +89,11 @@
     "wait-for-expect": "^3.0.0",
     "webdriver-manager": "^12.1.8"
   },
+  "peerDependencies": {
+    "@okta/okta-auth-js": "^5.8.0 || ^6.0.0 || ^7.0.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.3"
+  },
   "resolutions": {
     "**/request/qs": "^6.10.3",
     "**/wait-on/axios": "^0.27.2"
@@ -107,14 +111,16 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "workspaces": [
-    "./",
-    "test/app",
-    "test/e2e"
-  ],
-  "peerDependencies": {
-    "@okta/okta-auth-js": "^5.8.0 || ^6.0.0 || ^7.0.0",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.3"
+  "workspaces": {
+    "packages": [
+      "./",
+      "test/apps/*",
+      "test/e2e",
+      "test/e2e-wdio",
+      "env"
+    ],
+    "nohoist": [
+      "**/@wdio/**"
+    ]
   }
 }

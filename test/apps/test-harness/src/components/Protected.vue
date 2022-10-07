@@ -1,7 +1,7 @@
 <template>
   <div class="protected">
     {{ message }}
-    <pre class="userinfo">{{ user }}</pre>
+    <pre id="userinfo-container" class="userinfo">{{ user }}</pre>
   </div>
 </template>
 
