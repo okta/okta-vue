@@ -4,8 +4,8 @@ export type OnAuthRequiredFunction = (oktaAuth: OktaAuth) => Promise<void> | voi
 
 export interface OktaVueOptions {
   oktaAuth: OktaAuth;
-  onAuthRequired: OnAuthRequiredFunction;
-  onAuthResume: OnAuthRequiredFunction;
+  onAuthRequired?: OnAuthRequiredFunction;
+  onAuthResume?: OnAuthRequiredFunction;
 }
 
 declare module '@vue/runtime-core' {
