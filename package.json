@@ -50,7 +50,6 @@
     "@rollup/plugin-replace": "^2.3.4",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
-    "@vue/cli-plugin-eslint": "~5.0.4",
     "@vue/compiler-sfc": "^3.2.31",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "^2.0.0-beta.14",
@@ -61,7 +60,6 @@
     "eslint-config-standard": "^10.2.1",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-loader": "^1.7.1",
     "eslint-plugin-html": "^3.0.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jest": "^21.15.0",
@@ -96,7 +94,9 @@
   },
   "resolutions": {
     "**/request/qs": "^6.10.3",
-    "**/wait-on/axios": "^0.27.2"
+    "**/wait-on/axios": "^0.27.2",
+    "ua-parser-js": "^1.0.33",
+    "glob-parent": "^6.0.2"
   },
   "jest-junit": {
     "outputDirectory": "./test-reports/unit/",

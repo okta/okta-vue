@@ -27,7 +27,7 @@ declare const AUTH_JS: {
 }
 
 let _oktaAuth: OktaAuth
-let _onAuthRequired: OnAuthRequiredFunction
+let _onAuthRequired: OnAuthRequiredFunction | undefined
 let _router: Router
 let originalUriTracker: string
 

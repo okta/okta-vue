@@ -1,3 +1,11 @@
+# 5.6.0
+
+### Fixes
+
+- [#122](https://github.com/okta/okta-vue/pull/122)
+  - Fixes types; `onAuthRequired` and `onAuthResume` are now optional
+  - dependency updates
+
 # 5.5.0
 
 ### Features
