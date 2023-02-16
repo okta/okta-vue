@@ -61,7 +61,7 @@
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-html": "^3.0.0",
-    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest": "^21.15.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^3.4.0",
@@ -96,7 +96,9 @@
     "**/request/qs": "^6.10.3",
     "**/wait-on/axios": "^0.27.2",
     "ua-parser-js": "^1.0.33",
-    "glob-parent": "^6.0.2"
+    "glob-parent": "^6.0.2",
+    "**/lighthouse-logger/debug": "^3.1.0",
+    "**/babel-traverse/debug": "^3.1.0"
   },
   "jest-junit": {
     "outputDirectory": "./test-reports/unit/",
