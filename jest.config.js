@@ -39,7 +39,7 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
     '^.+\\.jsx?$': 'babel-jest',
-    '.*\\.(vue)$': 'vue3-jest'
+    '.*\\.(vue)$': '@vue/vue3-jest'
   },
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
