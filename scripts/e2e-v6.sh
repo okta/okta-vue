@@ -2,6 +2,11 @@
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
+if [ ! -z "$AUTHJS_VERSION" ]; then
+  echo "Skipping e2e tests against auth-js v6.x"
+  exit ${SUCCESS}
+fi
+
 setup_service java 1.8.222
 setup_service google-chrome-stable 106.0.5249.61-1
 
