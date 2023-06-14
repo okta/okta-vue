@@ -2,6 +2,11 @@
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
+if [ ! -z "$AUTHJS_VERSION" ]; then
+  echo "Skipping e2e tests against auth-js v6.x"
+  exit ${SUCCESS}
+fi
+
 setup_service java 1.8.222
 setup_service google-chrome-stable 106.0.5249.61-1
 
@@ -12,7 +17,7 @@ export CI=true
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
 export SPA_CLIENT_ID=0oapmwm72082GXal14x6
 export USERNAME=george@acme.com
-get_secret prod/okta-sdk-vars/password PASSWORD
+get_vault_secret_key devex/samples-javascript password PASSWORD
 
 if ! yarn add -DW --ignore-scripts @okta/okta-auth-js@^6; then
   echo "auth-js v6.x could not be installed"
