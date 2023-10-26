@@ -121,7 +121,7 @@ function install (app: App, {
   oktaAuth.authStateManager.subscribe(handleAuthStateUpdate)
 
   // Use mixin to support Options API
-  if (__VUE_OPTIONS_API__ !== false) {
+  if (typeof __VUE_OPTIONS_API__ === 'undefined' || __VUE_OPTIONS_API__ === true) {
     app.mixin({
       computed: {
         authState() {
