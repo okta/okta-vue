@@ -13,6 +13,7 @@
 import { mount } from '@vue/test-utils'
 import waitForExpect from 'wait-for-expect'
 import { AuthSdkError, OktaAuth } from '@okta/okta-auth-js'
+import { createRouter, createWebHistory } from 'vue-router'
 import OktaVue from '../../src/okta-vue'
 import { App } from '../components'
 
@@ -33,17 +34,18 @@ describe('OktaVue', () => {
   }
 
   function bootstrap (options = {}) {
-    mockRouter = {
-      replace: jest.fn()
-    }
+    mockRouter = createRouter({
+      history: createWebHistory(),
+      routes: [
+      ]
+    })
+    mockRouter.replace = jest.fn()
     wrapper = mount(App, {
       global: {
         plugins: [
-          [OktaVue, { oktaAuth, ...options }]
+          [OktaVue, { oktaAuth, ...options }],
+          mockRouter,
         ],
-        mocks: {
-          $router: mockRouter
-        }
       }
     })
   }
@@ -151,13 +153,6 @@ describe('OktaVue', () => {
       bootstrap()
       expect(wrapper.find('#state').text()).toBe('authenticated')
     })
-  })
-
-  it('should unsubscribe authState change when before component destroy', () => {
-    oktaAuth.authStateManager.unsubscribe = jest.fn()
-    bootstrap()
-    wrapper.unmount()
-    expect(oktaAuth.authStateManager.unsubscribe).toHaveBeenCalledWith(wrapper.vm.$_oktaVue_handleAuthStateUpdate)
   })
 
   it('should call service start, but not stop', () => {

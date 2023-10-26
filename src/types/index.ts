@@ -8,10 +8,21 @@ export interface OktaVueOptions {
   onAuthResume?: OnAuthRequiredFunction;
 }
 
+export type OktaAuthVue = OktaAuth & {
+  isInteractionRequiredError?: (error: Error) => boolean;
+  options: {
+    onAuthRequired?: OnAuthRequiredFunction;
+    onAuthResume?: OnAuthRequiredFunction;
+  };
+}
+
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    $auth: OktaAuth;
+    $auth: OktaAuthVue;
     authState: AuthState;
-    $_oktaVue_handleAuthStateUpdate: (authState: AuthState) => void;
   }
+}
+
+declare global {
+  const __VUE_OPTIONS_API__: boolean;
 }

@@ -10,39 +10,36 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+<script lang="ts">
+import { h, ref, onBeforeMount, Slot } from 'vue'
+import { useAuth } from '../okta-vue'
 
-<script>
-import { defineComponent, h } from 'vue'
-
-export default defineComponent({
-  name: 'LoginCallback',
-  data() {
-    return {
-      error: null
-    };
-  },
-  async beforeMount () {
-    try {
-      await this.$auth.handleLoginRedirect();
-    } catch (e) {
-      const isInteractionRequiredError = this.$auth.isInteractionRequiredError || this.$auth.idx.isInteractionRequiredError;
-      if (isInteractionRequiredError(e)) {
-        const { onAuthResume, onAuthRequired } = this.$auth.options;
-        const callbackFn = onAuthResume || onAuthRequired;
-        if (callbackFn) {
-          callbackFn(this.$auth);
-          return;
+export default {
+  setup(_props: {}, { slots }: { slots: { error?: Slot } }) {
+    const error = ref<string | null>(null);
+    const $auth = useAuth();
+    onBeforeMount(async () => {
+      try {
+        await $auth.handleLoginRedirect();
+      } catch (e) {
+        const isInteractionRequiredError = $auth.isInteractionRequiredError || $auth.idx.isInteractionRequiredError;
+        if (isInteractionRequiredError(e)) {
+          const { onAuthResume, onAuthRequired } = $auth.options;
+          const callbackFn = onAuthResume || onAuthRequired;
+          if (callbackFn) {
+            callbackFn($auth);
+            return;
+          }
         }
+        error.value = e.toString();
       }
-      this.error = e.toString();
+    });
+    return () => {
+      if (slots.error) {
+        return h('div', slots.error({ error: error.value }));
+      }
+      return error.value;
     }
-  },
-  render() {
-    if (this.$slots.error) {
-      return h('div', this.$slots.error({ error: this.error }));
-    }
-
-    return this.error;
   }
-})
+}
 </script>

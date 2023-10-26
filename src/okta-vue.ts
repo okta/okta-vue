@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { App } from 'vue'
+import { App, shallowRef, triggerRef, version } from 'vue'
 import { Router, RouteLocationNormalized } from 'vue-router'
 import { AuthSdkError, OktaAuth, AuthState, toRelativeUrl } from '@okta/okta-auth-js'
 import { compare } from 'compare-versions';
-import { OktaVueOptions, OnAuthRequiredFunction } from './types'
+import { OktaVueOptions, OnAuthRequiredFunction, OktaAuthVue } from './types'
 
 // constants are defined in webpack.config.js
 declare const PACKAGE: {
@@ -26,9 +26,8 @@ declare const AUTH_JS: {
   minSupportedVersion: string;
 }
 
-let _oktaAuth: OktaAuth
+let _oktaAuth: OktaAuthVue
 let _onAuthRequired: OnAuthRequiredFunction | undefined
-let _router: Router
 let originalUriTracker: string
 
 const guardSecureRoute = async (authState: AuthState | null) => {
@@ -101,9 +100,10 @@ function install (app: App, {
   if (!oktaAuth.options.restoreOriginalUri) {
     oktaAuth.options.restoreOriginalUri = async (oktaAuth: OktaAuth, originalUri: string) => {
       // If a router is available, provide a default implementation
-      if (_router) {
+      const $router: Router = app.config.globalProperties.$router;
+      if ($router) {
         const path = toRelativeUrl(originalUri || '/', window.location.origin);
-        _router.replace({ path })
+        $router.replace({ path })
       }
     }
   }
@@ -112,33 +112,30 @@ function install (app: App, {
   // Also starts services
   oktaAuth.start();
 
-  app.mixin({
-    data () {
-      return {
-        authState: oktaAuth.authStateManager.getAuthState()
+  // Subscribe to the latest authState
+  const authStateRef = shallowRef(oktaAuth.authStateManager.getAuthState())
+  const handleAuthStateUpdate = async function(authState: AuthState) {
+    authStateRef.value = authState
+    triggerRef(authStateRef)
+  }
+  oktaAuth.authStateManager.subscribe(handleAuthStateUpdate)
+
+  // Use mixin to support Options API
+  if (__VUE_OPTIONS_API__ !== false) {
+    app.mixin({
+      computed: {
+        authState() {
+          return authStateRef.value
+        }
       }
-    },
-    beforeCreate () {
-      // assign router for the default restoreOriginalUri callback
-      _router = this.$router
-    },
-    created () {
-      // subscribe to the latest authState
-      this.authState = oktaAuth.authStateManager.getAuthState()
-      oktaAuth.authStateManager.subscribe(this.$_oktaVue_handleAuthStateUpdate)
-    },
-    beforeUnmount () {
-      oktaAuth.authStateManager.unsubscribe(this.$_oktaVue_handleAuthStateUpdate)
-    },
-    // private property naming convention follows
-    // https://vuejs.org/v2/style-guide/#Private-property-names-essential
-    methods: {
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      async $_oktaVue_handleAuthStateUpdate (authState: AuthState) {
-        this.authState = Object.assign(this.authState || {}, authState)
-      }
-    }
-  })
+    })
+  }
+  // Provide ref to authState to support Composition API
+  if (compare(version, '3.3', '<')) {
+    // Should be unwrapped in all 3.x versions
+    app.config.unwrapInjectedRef = true
+  }
+  app.provide('okta.authState', authStateRef)
 
   // add additional options to oktaAuth options
   Object.assign(oktaAuth.options, {
