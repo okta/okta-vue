@@ -35,6 +35,7 @@ export default defineConfig({
   define: {
     'process.env': env,
     'CONFIG': env,
+    '__VUE_OPTIONS_API__': false
   },
   resolve: {
     alias: [
