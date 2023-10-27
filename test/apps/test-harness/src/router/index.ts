@@ -10,7 +10,7 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/login/callback', component: LoginCallback },
     { path: '/protected', component: Protected, meta: { requiresAuth: true } },
-    { path: '/sessionToken', component: SessionTokenLogin }
+    { path: '/sessionToken', component: SessionTokenLogin, props: { withRedirect: true } }
   ]
 })
 

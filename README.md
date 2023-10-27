@@ -157,8 +157,9 @@ If a user does not have a valid session, then a new authorization flow will begi
 
 ### Show Login and Logout Buttons
 
-In the relevant location in your application, you will want to provide `Login` and `Logout` buttons for the user. You can show/hide the correct button by using the injected reactive [authState][] property. For example:
+In the relevant location in your application, you will want to provide `Login` and `Logout` buttons for the user. You can show/hide the correct button by using the injected reactive [authState][] property. 
 
+Example for Options API:
 ```typescript
 // src/App.vue
 
@@ -188,8 +189,7 @@ export default defineComponent({
 </script>
 ```
 
-If you are using setup function or setup script, you can access the oktaAuth instance with `useAuth` composable.
-
+If you are using Composition API, you can access the OktaAuth instance with `useAuth()` composable.
 ```typescript
 // src/App.vue
 
@@ -205,7 +205,7 @@ If you are using setup function or setup script, you can access the oktaAuth ins
 <script setup lang="ts">
 import { useAuth } from '@okta/okta-vue';
 
-const auth = useAuth();
+const $auth = useAuth();
 
 const login = async () => {
   await auth.signInWithRedirect()
@@ -214,6 +214,16 @@ const login = async () => {
 const logout = async () => {
   await auth.signOut()
 }
+</script>
+```
+
+If you have disabled Options API (use [`__VUE_OPTIONS_API__: false`](https://github.com/vuejs/core/blob/main/packages/vue/README.md#bundler-build-feature-flags)), you need to inject `okta.authState` and expose property named `authState` in setup in order to use `authState` in template:
+
+```typescript
+<script setup lang="ts">
+import { ShallowRef, inject } from 'vue';
+import { AuthState } from '@okta/okta-auth-js';
+const authState = inject<ShallowRef<AuthState>>('okta.authState')
 </script>
 ```
 
@@ -310,7 +320,26 @@ Note that `onAuthResume` has the same signature as `onAuthRequired`. If you do n
 
 ### `$auth`
 
-This SDK works as a [Vue Plugin][]. It provides an instance of the [Okta Auth SDK][] to your components on the [globalProperties][]. You can access the [Okta Auth SDK][] instance by using `this.$auth` in your components.
+This SDK works as a [Vue Plugin][]. It provides an instance of the [Okta Auth SDK][] to your components on the [globalProperties][]. For Options API you can access the [Okta Auth SDK][] instance by using `this.$auth` in your components. For Composition API you can access the OktaAuth instance with `useAuth()` composable.
+
+```typescript
+import { useAuth } from '@okta/okta-vue';
+const $auth = useAuth();
+```
+
+### `authState`
+
+This SDK provides reactive [authState][] property for your components. For Options API you can access the value by using `this.authState` in your components. For Composition API you can inject `okta.authState`:
+
+```typescript
+import { inject, ShallowRef } from 'vue';
+import { AuthState } from '@okta/okta-auth-js';
+const authState = inject<ShallowRef<AuthState>>('okta.authState');
+// use authState.value
+```
+
+Note that if you have disabled Options API (with [`__VUE_OPTIONS_API__: false`](https://github.com/vuejs/core/blob/main/packages/vue/README.md#bundler-build-feature-flags)), you need to expose property `authState` in setup in order to use `authState` in template.
+
 
 ### `LoginCallback`
 

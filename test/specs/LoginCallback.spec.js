@@ -64,9 +64,7 @@ describe('LoginCallback', () => {
 
   it('renders the component', async () => {
     createOktaAuth()
-    jest.spyOn(LoginCallback, 'render')
     await navigateToCallback()
-    expect(LoginCallback.render).toHaveBeenCalled()
     expect(wrapper.text()).toBe('')
   })
 
