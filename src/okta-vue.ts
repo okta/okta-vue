@@ -131,10 +131,6 @@ function install (app: App, {
     })
   }
   // Provide ref to authState to support Composition API
-  if (compare(version, '3.3', '<')) {
-    // Should be unwrapped in all 3.x versions
-    app.config.unwrapInjectedRef = true
-  }
   app.provide('okta.authState', authStateRef)
 
   // add additional options to oktaAuth options
