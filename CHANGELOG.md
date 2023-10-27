@@ -1,3 +1,15 @@
+# 5.7.0
+
+### Features
+
+- [#139](https://github.com/okta/okta-vue/pull/139)
+  - Plugin supports both Options API and Composition API
+  - `LoginCallback` component and test app migrated to Composition API
+
+### Fixes
+
+- [#139](https://github.com/okta/okta-vue/pull/139) Fixes `TypeError: 'set' on proxy: trap returned falsish for property 'authState'` when plugin is used in app with Composition API
+
 # 5.6.0
 
 ### Fixes
