@@ -1433,6 +1433,14 @@
     webcrypto-shim "^0.1.5"
     xhr2 "0.1.3"
 
+"@okta/okta-vue@*":
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-vue/-/okta-vue-5.6.0.tgz#4b0a1b707803c80b5a52be7f5c32b4f4cdaa0639"
+  integrity sha512-vmT+1cXgyjY/Ayq+5k8gFg/gRD+pT7qQlchcxNs8CnRLr17ZpFWe8CQJxaJAYMeSJy+ZFLBFa1PWs/Dl8X19FQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    compare-versions "^4.1.2"
+
 "@peculiar/asn1-schema@^2.1.6":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.3.0.tgz#5368416eb336138770c692ffc2bab119ee3ae917"
@@ -8033,9 +8041,9 @@ which@^2.0.1, which@^2.0.2:
     isexe "^2.0.0"
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.3.tgz#610636f6b1f703891bd34771ccb17fb93b47079c"
-  integrity sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.4.tgz#cb4b50ec9aca570abd1f52f33cd45b6c61739a9f"
+  integrity sha512-2V81OA4ugVo5pRo46hAoD2ivUJx8jXmWXfUkY4KFNw0hEptvN0QfH3K4nHiwzGeKl5rFKedV48QVoqYavy4YpA==
 
 wrap-ansi@^7.0.0:
   version "7.0.0"
