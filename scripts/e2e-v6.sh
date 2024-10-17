@@ -17,7 +17,7 @@ export CI=true
 export ISSUER=https://samples-javascript.okta.com/oauth2/default
 export SPA_CLIENT_ID=0oapmwm72082GXal14x6
 export USERNAME=george@acme.com
-get_vault_secret_key devex/samples-javascript password PASSWORD
+get_terminus_secret "/" PASSWORD PASSWORD
 
 if ! yarn add -DW --ignore-scripts @okta/okta-auth-js@^6; then
   echo "auth-js v6.x could not be installed"
