@@ -205,7 +205,7 @@ If you are using Composition API, you can access the OktaAuth instance with `use
 <script setup lang="ts">
 import { useAuth } from '@okta/okta-vue';
 
-const $auth = useAuth();
+const auth = useAuth();
 
 const login = async () => {
   await auth.signInWithRedirect()
