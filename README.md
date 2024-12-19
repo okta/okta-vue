@@ -195,7 +195,11 @@ If you are using Composition API, you can access the OktaAuth instance with `use
 
 <template>
   <div id="app">
-    <router-link to="/" tag="button" id='home-button'> Home </router-link>
+    <router-link to="/" custom v-slot="{ navigate, isActive, isExactActive }" id="home-button">
+      <button :class="{ 'router-link-active': isActive, 'router-link-exact-active': isExactActive }" @click="navigate">
+        Home
+      </button>
+    </router-link>
     <button v-if='authState && authState.isAuthenticated' v-on:click='logout' id='logout-button'> Logout </button>
     <button v-else v-on:click='login' id='login-button'> Login </button>
     <router-view/>
