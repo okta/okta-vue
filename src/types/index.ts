@@ -16,7 +16,7 @@ export type OktaAuthVue = OktaAuth & {
   };
 }
 
-declare module '@vue/runtime-core' {
+declare module 'vue' {
   interface ComponentCustomProperties {
     $auth: OktaAuthVue;
     authState: AuthState;
