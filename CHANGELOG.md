@@ -1,3 +1,9 @@
+# 5.8.0
+
+### Fixes
+[#150](https://github.com/okta/okta-vue/pull/150) Updates global properties type declaraton
+  - resolves [#149](https://github.com/okta/okta-vue/pull/149)
+
 # 5.7.0
 
 ### Features
