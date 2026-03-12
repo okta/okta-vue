@@ -1,3 +1,9 @@
+# 5.9.0
+
+### Features
+
+ - [#151](https://github.com/okta/okta-vue/pull/151) adds `@okta/okta-auth-js@8.0.0` as supported
+
 # 5.8.0
 
 ### Fixes
