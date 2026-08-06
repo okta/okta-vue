@@ -18,12 +18,7 @@ module.exports = {
   ],
   globals: {
     'PACKAGE': packageInfo,
-    'AUTH_JS': { minSupportedVersion: '5.3.1' },
-    'ts-jest': {
-      diagnostics: {
-        warnOnly: true
-      }
-    }
+    'AUTH_JS': { minSupportedVersion: '5.3.1' }
   },
   restoreMocks: true,
   moduleFileExtensions: [
@@ -37,10 +32,13 @@ module.exports = {
     '**/test/specs/**/*.spec.[jt]s?(x)'
   ],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.tsx?$': ['ts-jest', { diagnostics: { warnOnly: true } }],
+    '^.+\\.m?jsx?$': 'babel-jest',
     '.*\\.(vue)$': '@vue/vue3-jest'
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(nostics)/)'
+  ],
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
     './test/jest.setup.js'
