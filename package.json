@@ -102,7 +102,8 @@
     "**/babel-traverse/debug": "^3.1.0",
     "**/axios": "^1.15.0",
     "picomatch": "2.3.1",
-    "node-releases": "2.0.44"
+    "node-releases": "2.0.44",
+    "selenium-standalone": "8.2.1"
   },
   "jest-junit": {
     "outputDirectory": "./test-reports/unit/",
