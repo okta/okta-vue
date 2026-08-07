@@ -10,6 +10,9 @@ module.exports = {
     'eslint:recommended',
     '@vue/typescript/recommended'
   ],
+  rules: {
+    'vue/multi-word-component-names': 'off'
+  },
   overrides: [
     {
       files: ['vue.config.js'],

@@ -9,5 +9,8 @@ module.exports = {
     'plugin:vue/essential',
     'eslint:recommended',
     '@vue/typescript/recommended'
-  ]
+  ],
+  rules: {
+    'vue/multi-word-component-names': 'off'
+  }
 };
