@@ -6,8 +6,22 @@
   "main": "dist/bundles/okta-vue.cjs.js",
   "module": "dist/bundles/okta-vue.esm.js",
   "types": "dist/bundles/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/bundles/types/index.d.ts",
+      "import": "./dist/bundles/okta-vue.esm.js",
+      "require": "./dist/bundles/okta-vue.cjs.js"
+    },
+    "./client-js": {
+      "types": "./dist/bundles/types/client-js/index.d.ts",
+      "import": "./dist/bundles/okta-vue-client-js.esm.js"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
   "files": [
     "bundles",
+    "client-js",
     "src"
   ],
   "scripts": {
@@ -45,7 +59,10 @@
     "@babel/eslint-parser": "^7.25.9",
     "@babel/plugin-transform-runtime": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
+    "@okta/auth-foundation": "^0.6.0",
+    "@okta/oauth2-flows": "^0.6.0",
     "@okta/okta-auth-js": "^8.0.1",
+    "@okta/spa-platform": "^0.6.0",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-replace": "^6.0.3",
@@ -89,9 +106,23 @@
     "webdriver-manager": "^12.1.9"
   },
   "peerDependencies": {
+    "@okta/auth-foundation": "^0.6.0",
+    "@okta/oauth2-flows": "^0.6.0",
     "@okta/okta-auth-js": "^5.8.0 || ^6.0.0 || ^7.0.0 || ^8.0.0",
+    "@okta/spa-platform": "^0.6.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.3 || ^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@okta/auth-foundation": {
+      "optional": true
+    },
+    "@okta/oauth2-flows": {
+      "optional": true
+    },
+    "@okta/spa-platform": {
+      "optional": true
+    }
   },
   "resolutions": {
     "core-js": "^3.39.0",

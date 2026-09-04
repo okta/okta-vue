@@ -39,6 +39,12 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!(nostics)/)'
   ],
+  moduleNameMapper: {
+    // `@okta/spa-platform` is ESM-only and node_modules stays untransformed (see
+    // transformIgnorePatterns above), so requiring the real package from a spec throws
+    // ERR_REQUIRE_ESM. src/client-js/ imports exactly two values from it; the stub provides both.
+    '^@okta/spa-platform$': '<rootDir>/test/mocks/spa-platform.js'
+  },
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
     './test/jest.setup.js'

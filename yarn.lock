@@ -1641,6 +1641,16 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@okta/auth-foundation@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@okta/auth-foundation/-/auth-foundation-0.6.0.tgz#25b729bc8d15de53025e08d619f4ec19e072687f"
+  integrity sha512-AueDPbgox+E0To/SYrxpjQwiyI2HwxNqp1aWn/90ZonevTiJAk+o5kSp9i+Y7j08aUEc1NGXKJj989I+ZXsRbQ==
+
+"@okta/oauth2-flows@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@okta/oauth2-flows/-/oauth2-flows-0.6.0.tgz#1df28e8167b67912dfca31bd755593aa1f66425d"
+  integrity sha512-wCReTJegsaRYeycPcXeuyuPlQ2G5ZA6ttTJ/Is4rvBDCOQk8vMEq+B8Sd3n1v8tOddWP2HTRiIffu/92PqXRRQ==
+
 "@okta/okta-auth-js@^8.0.1":
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/@okta/okta-auth-js/-/okta-auth-js-8.0.1.tgz#0b621cf5a6dd5d83ab687a3527ac71c6dac3199d"
@@ -1651,6 +1661,11 @@
     js-cookie "^3.0.5"
     node-cache "^5.1.2"
     tiny-emitter "2.1.0"
+
+"@okta/spa-platform@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@okta/spa-platform/-/spa-platform-0.6.0.tgz#ac232752117835f7815459e7ce7d1f622c241953"
+  integrity sha512-VCQbvbnBtpwXBMg98ysRMyvdgjqj03wqPYEda4wyHEo31NN+KwzbwOaNAlxzg0+04MT2iDB0S+krA6MYGXA59w==
 
 "@one-ini/wasm@0.1.1":
   version "0.1.1"

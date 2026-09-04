@@ -381,6 +381,327 @@ const options: OktaVueOptions = {
 }
 ```
 
+## Using `@okta/okta-vue/client-js`
+
+> :warning: The `@okta/okta-client-javascript` packages are currently in **beta**, and so is this
+> subpath. Its API may change in a minor release.
+
+Everything above uses [Okta Auth SDK][] (`@okta/okta-auth-js`). As an alternative, this SDK also
+ships an opt-in integration with [`@okta/okta-client-javascript`](https://github.com/okta/okta-client-javascript),
+behind the `@okta/okta-vue/client-js` subpath.
+
+The two paths are entirely separate. Nothing in the default entry point imports from this subpath or
+from the `@okta/okta-client-javascript` packages, so if you never import `@okta/okta-vue/client-js`
+you don't need to install them, and nothing about your app changes.
+
+### The main difference: there is no `authState`
+
+`@okta/okta-auth-js` keeps a persistent `authState` object that the SDK exposes as a reactive
+property, and your app reads to decide what to render. `@okta/okta-client-javascript` has no such
+object. Instead, authentication is resolved at the moment it's needed — before a guarded navigation,
+and before each request — by looking up a stored credential, refreshing it if it has expired, or
+redirecting to Okta if neither is possible.
+
+So this subpath deliberately provides **no** `authState` ref and **no** `$auth` global property. A
+snapshot of "am I signed in?" would go stale the moment it was read. Gate routes with
+[`createAuthGuard`](#createauthguard) and load data with [`useOktaFetch`](#useoktafetch) instead —
+both re-resolve authentication when it matters.
+
+### Installation
+
+The three `@okta/okta-client-javascript` packages are optional peer dependencies. Install them
+alongside `@okta/okta-vue`:
+
+```bash
+npm install --save @okta/okta-vue @okta/auth-foundation @okta/oauth2-flows @okta/spa-platform
+```
+
+This subpath is published as ES modules only, because the packages above are ESM-only. Any modern
+bundler (Vite, webpack 5, Rollup) handles it; a CommonJS `require()` will not.
+
+### Configuration
+
+Build the orchestrator your app will authenticate through, then hand it to `createOktaClient()` and
+install the result like any [Vue Plugin][]:
+
+```typescript
+// src/okta.ts
+import {
+  AuthorizationCodeFlow,
+  AuthorizationCodeFlowOrchestrator,
+  OAuth2Client,
+  SessionLogoutFlow
+} from '@okta/spa-platform'
+import { createOktaClient } from '@okta/okta-vue/client-js'
+
+const client = new OAuth2Client({
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
+  clientId: '{clientId}',
+  scopes: ['openid', 'profile', 'email', 'offline_access']
+})
+
+const signInFlow = new AuthorizationCodeFlow(client, {
+  redirectUri: `${window.location.origin}/login/callback`
+})
+
+export const signOutFlow = new SessionLogoutFlow(client, {
+  logoutRedirectUri: window.location.origin
+})
+
+export const orchestrator = new AuthorizationCodeFlowOrchestrator(signInFlow)
+export const okta = createOktaClient({ orchestrator, signOutFlow })
+```
+
+```typescript
+// src/main.ts
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import { okta } from './okta'
+
+createApp(App)
+  .use(router)
+  .use(okta)
+  .mount('#app')
+```
+
+Every piece of this integration derives from that single `orchestrator`: the navigation guard, the
+`FetchClient` behind `useOktaFetch`, and the credential the callback route stores. Passing one
+instance keeps them in sync — a guard reading one orchestrator while the callback route writes to
+another would break the credential handoff with nothing to show for it.
+
+#### `createOktaClient` options
+
+- `orchestrator` **(required)**: An `AuthorizationCodeFlowOrchestrator`.
+- `signOutFlow` *(optional)*: A `SessionLogoutFlow`. Required by `useOktaAuth().signOut()`, which
+  throws without it.
+- `fetchClient` *(optional)*: A `FetchClient` for `useOktaFetch` to use. Defaults to
+  `new FetchClient(orchestrator)`. Pass your own only when you need non-default `APIClient`
+  configuration or request interceptors — and build it from the same `orchestrator`.
+- `restoreOriginalUri` *(optional)*: `(originalUri: string) => void | Promise<void>`. Called by
+  `LoginCallback` once the code exchange succeeds. Defaults to `router.replace(originalUri)`.
+
+### Protect routes
+
+Mark protected routes with `meta.requiresAuth` and register the guard. The plugin exposes one bound
+to its own orchestrator as `okta.authGuard`:
+
+```typescript
+// src/router/index.ts
+import { createRouter, createWebHistory } from 'vue-router'
+import { LoginCallback } from '@okta/okta-vue/client-js'
+import { okta } from '../okta'
+import Home from '../components/Home.vue'
+import Protected from '../components/Protected.vue'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: Home },
+    { path: '/login/callback', component: LoginCallback },
+    { path: '/protected', component: Protected, meta: { requiresAuth: true } }
+  ]
+})
+
+router.beforeEach(okta.authGuard)
+
+export default router
+```
+
+A route is protected when it, or any of its ancestors, carries `meta: { requiresAuth: true }`.
+
+To protect a single route instead of registering a global guard, build one with `createAuthGuard()`
+and use it as a `beforeEnter`:
+
+```typescript
+import { createAuthGuard } from '@okta/okta-vue/client-js'
+import { orchestrator } from '../okta'
+
+{
+  path: '/protected',
+  component: Protected,
+  meta: { requiresAuth: true },
+  beforeEnter: createAuthGuard(orchestrator)
+}
+```
+
+#### What the guard does on an invalid or expired session
+
+This matches the `@okta/okta-auth-js` [`navigationGuard`](#add-a-protected-route): the target route
+is recorded as the post-login destination, the browser is redirected to Okta, and the navigation is
+abandoned.
+
+Concretely, the guard has three outcomes:
+
+- **A credential is available** (possibly after a silent refresh) — the navigation proceeds.
+- **None is available** — the orchestrator redirects to Okta. The returned promise never settles,
+  because the browser unloads first, so the navigation never completes.
+- **None is available and the orchestrator was built with `avoidPrompting: true`** — it declines to
+  redirect and returns `null`, so the guard returns `false` and the navigation is aborted with
+  nowhere to go. Handle that yourself with an additional guard or a `router.onError` handler.
+
+Unexpected failures — a token endpoint error, a flow already in progress — are left to propagate, so
+`vue-router` surfaces them through `router.onError()` rather than silently aborting.
+
+Note that unlike the `okta-auth-js` guard, this one does not re-check when a credential expires
+*while* the user sits on a protected route: there is no auth-state subscription to do it with.
+Expiry is caught at request time instead, by the `FetchClient` behind `useOktaFetch`, which runs the
+same resolve/refresh/redirect logic before every request.
+
+#### `createAuthGuard` options
+
+`createAuthGuard(orchestrator, options?)` accepts:
+
+- `originalUri` *(optional)*: `(to: RouteLocationNormalized) => string`. Where to send the user after
+  they sign in. Defaults to `to => to.fullPath`, matching the auth-js path's
+  `setOriginalUri(to.fullPath)`. The guard owns this because it is the only place that knows the
+  route being *entered* — inside a `beforeEach` guard, `window.location` still points at the page
+  being left.
+- `params` *(optional)*: Extra `AuthorizeParams` (`scopes`, `acrValues`, `maxAge`, …) for the guard's
+  token request, or a function deriving them from the route:
+  `to => ({ scopes: to.meta.scopes })`.
+
+### Use the `LoginCallback` component
+
+Route your redirect URI at the `LoginCallback` exported from this subpath. It completes the
+authorization code exchange, then navigates to the `originalUri` recorded when the flow started
+(falling back to `/`). Errors are rendered as text, or through an `error` scoped slot if you provide
+one:
+
+```vue
+<LoginCallback>
+  <template #error="{ error }">
+    <p v-if="error">Sign-in failed: {{ error }}</p>
+  </template>
+</LoginCallback>
+```
+
+### Show login and logout buttons
+
+```vue
+<script setup lang="ts">
+import { useOktaAuth } from '@okta/okta-vue/client-js'
+
+const { signIn, signOut } = useOktaAuth()
+</script>
+
+<template>
+  <button @click="signIn()">Login</button>
+  <button @click="signOut()">Logout</button>
+</template>
+```
+
+`signIn()` resolves without navigating if a usable credential already exists; otherwise it redirects
+to Okta. `signOut()` revokes and clears the stored credential, then redirects to Okta's logout
+endpoint — pass `{ revokeTokens: false }` to clear local state without telling the authorization
+server. It requires the `signOutFlow` you passed to `createOktaClient()`.
+
+If you need the POST-based variant of logout — for instance when the `id_token_hint` would push the
+logout URL past a URL length limit — drive it from your own `SessionLogoutFlow` instead of
+`signOut()`:
+
+```typescript
+import { SessionLogoutFlow } from '@okta/spa-platform'
+import { signOutFlow } from './okta'
+
+await SessionLogoutFlow.PerformPostRedirect(await signOutFlow.start(idToken))
+```
+
+### Fetch protected resources
+
+`useOktaFetch()` requests an authenticated resource and exposes it as reactive state. The underlying
+`FetchClient` resolves a credential, refreshes it if needed, or redirects to Okta if it can't, all
+before the request goes out — there is no separate "am I signed in?" check to make first.
+
+```vue
+<script setup lang="ts">
+import { useOktaFetch } from '@okta/okta-vue/client-js'
+
+interface Message { id: string; text: string }
+
+const { data, error, isLoading } = useOktaFetch<Message[]>('/api/messages')
+</script>
+
+<template>
+  <p v-if="isLoading">Loading…</p>
+  <p v-else-if="error">Could not load messages.</p>
+  <ul v-else>
+    <li v-for="message in data" :key="message.id">{{ message.text }}</li>
+  </ul>
+</template>
+```
+
+Pass a `ref` or a getter to re-fetch whenever it changes. Responses that arrive out of order are
+discarded, so `data` always reflects the most recent request:
+
+```typescript
+const route = useRoute()
+const { data } = useOktaFetch(() => `/api/users/${route.params.userId}/messages`)
+```
+
+`useOktaFetch(resource, options?)` returns `{ data, error, isLoading, response, refresh }`. `error`
+holds a thrown error, or — for a non-2xx response — the `Response` itself. Beyond `immediate` and
+`parse` below, remaining options are forwarded to `FetchClient.fetch()` as the request init, so
+`method`, `headers`, `body`, `scopes` and friends all work:
+
+- `immediate` *(optional)*: Fetch during setup, and again whenever a reactive `resource` changes.
+  Defaults to `true`; pass `false` to fetch only via `refresh()`.
+- `parse` *(optional)*: Turns a successful `Response` into `data`. Defaults to
+  `response => response.json()`.
+
+For imperative requests — form submissions, button handlers — use `useOktaFetchClient()` to get the
+`FetchClient` directly:
+
+```vue
+<script setup lang="ts">
+import { useOktaFetchClient } from '@okta/okta-vue/client-js'
+
+const fetchClient = useOktaFetchClient()
+
+async function save (profile: Profile) {
+  await fetchClient.fetch('/api/profile', {
+    method: 'POST',
+    body: JSON.stringify(profile),
+    headers: { 'Content-Type': 'application/json' }
+  })
+}
+</script>
+```
+
+Because the client re-authenticates on demand, a component calling `useOktaFetch()` can trigger a
+full-page redirect to Okta during setup. That's by design on this path. For routes where you'd
+rather resolve authentication before the component mounts at all, guard the route as well.
+
+### Access the orchestrator directly
+
+`useOktaAuth()` also returns the `orchestrator` and a `getToken()` that delegates to it, as the
+escape hatch for anything not wrapped here:
+
+```typescript
+const { orchestrator, getToken } = useOktaAuth()
+
+const token = await getToken({ scopes: ['openid', 'admin'] })
+```
+
+`getToken()` returns `null` only when the orchestrator was built with `avoidPrompting: true` and
+declined to redirect; otherwise it either resolves a token or navigates away.
+
+If you'd rather not go through the composables at all, the plugin's context is provided under an
+exported injection key:
+
+```typescript
+import { inject } from 'vue'
+import { OktaClientKey } from '@okta/okta-vue/client-js'
+
+const { orchestrator, fetchClient } = inject(OktaClientKey)!
+```
+
+### Known caveat
+
+`@okta/okta-auth-js` is still a required peer dependency of `@okta/okta-vue`, so a project using
+only this subpath will see a peer-dependency warning for it. Making it optional is a breaking change
+and is deferred to the next major version.
+
 ## Migrating
 
 Each major version release introduces breaking changes, see [MIGRATING GUIDE](MIGRATING.md) to get your application properly updated.

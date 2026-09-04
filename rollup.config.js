@@ -25,6 +25,7 @@ const makeExternalPredicate = externalArr => {
 }
 
 const input = 'src/index.ts'
+const clientJsInput = 'src/client-js/index.ts'
 
 const commonPlugins = [
   commonjs(),
@@ -95,5 +96,27 @@ export default [
         sourcemap: true
       }
     ]
+  },
+  // The opt-in `@okta/okta-vue/client-js` subpath. ESM only, deliberately: the
+  // `@okta/okta-client-javascript` packages it externalizes are ESM-only (no `require` condition in
+  // their `exports` maps), so a CJS build here would emit `require()` calls that throw
+  // ERR_REQUIRE_ESM at runtime.
+  {
+    input: clientJsInput,
+    external: makeExternalPredicate(external),
+    plugins: [
+      typescript({
+        typescript: require('typescript'),
+        useTsconfigDeclarationDir: true
+      }),
+      vue(),
+      ...commonPlugins
+    ],
+    output: {
+      format: 'esm',
+      file: 'dist/bundles/okta-vue-client-js.esm.js',
+      exports: 'named',
+      sourcemap: true
+    }
   }
 ]

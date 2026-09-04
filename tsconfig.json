@@ -2,7 +2,10 @@
   "compilerOptions": {
     "module": "es6",
     "target": "es5",
-    "moduleResolution": "node",
+    // "bundler" rather than "node": the @okta/okta-client-javascript packages expose their types
+    // through `exports` subpath maps (e.g. `@okta/spa-platform` re-exports
+    // `@okta/auth-foundation/core`), which legacy node resolution cannot see.
+    "moduleResolution": "bundler",
     "lib": [
       "esnext",
       "dom",
