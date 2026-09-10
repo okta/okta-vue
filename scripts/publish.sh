@@ -28,7 +28,10 @@ if ! ci-append-sha; then
 fi
 
 npm config set @okta:registry ${REGISTRY}
-if ! npm publish --registry ${REGISTRY}; then
+# newer npm (bundled with Node 24) requires an explicit --tag for prerelease-looking
+# versions (e.g. the SHA-suffixed version ci-append-sha produces); pass "latest" to
+# match npm's old implicit default so publish behavior is unchanged.
+if ! npm publish --registry ${REGISTRY} --tag latest; then
   echo "npm publish failed! Exiting..."
   exit ${PUBLISH_ARTIFACTORY_FAILURE}
 fi
