@@ -58,30 +58,57 @@ describe('createOktaClient', () => {
   })
 
   describe('install', () => {
-    function install (options) {
-      const okta = createOktaClient(options)
-      let context
-      mount(
-        {
-          setup () {
-            context = inject(OktaClientKey)
-            return () => null
-          }
-        },
-        { global: { plugins: [okta] } }
-      )
-      return { okta, context }
+    /** Runs a plugin's `install()` by mounting an app with it. */
+    function use (okta, setup = () => () => null) {
+      mount({ setup }, { global: { plugins: [okta] } })
+      return okta
     }
 
     it('provides its context under OktaClientKey', () => {
-      const { okta, context } = install({ orchestrator })
+      let context
+      const okta = use(createOktaClient({ orchestrator }), () => {
+        context = inject(OktaClientKey)
+        return () => null
+      })
+
       expect(context.orchestrator).toBe(orchestrator)
       expect(context.fetchClient).toBe(okta.fetchClient)
     })
 
-    it('registers the SDK with the Okta user agent', () => {
-      install({ orchestrator })
-      expect(addEnv).toHaveBeenCalledWith(`${PKG.name}/${PKG.version}`)
+    describe('user agent registration', () => {
+      // Both halves of this are module state — `addEnv` appends to a list inside the SDK, and
+      // `createOktaClient` guards against registering twice — so clearing the mock isn't enough.
+      // Each case needs a module graph that has never registered anything.
+      function freshModules () {
+        let modules
+        jest.isolateModules(() => {
+          modules = {
+            createOktaClient: require('../../../src/client-js').createOktaClient,
+            addEnv: require('@okta/spa-platform').addEnv
+          }
+        })
+        return modules
+      }
+
+      it('registers the SDK with the Okta user agent', () => {
+        const modules = freshModules()
+
+        use(modules.createOktaClient({ orchestrator }))
+
+        expect(modules.addEnv).toHaveBeenCalledWith(`${PKG.name}/${PKG.version}`)
+      })
+
+      // Two `app.use(okta)` calls — multiple apps on a page, or a test suite mounting repeatedly —
+      // would otherwise repeat the string in the `X-Okta-User-Agent-Extended` header of every request.
+      it('registers it only once, however many times install() runs', () => {
+        const modules = freshModules()
+        const okta = use(modules.createOktaClient({ orchestrator }))
+
+        use(okta)
+        use(modules.createOktaClient({ orchestrator }))
+
+        expect(modules.addEnv).toHaveBeenCalledTimes(1)
+      })
     })
   })
 })

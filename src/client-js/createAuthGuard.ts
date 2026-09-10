@@ -80,12 +80,22 @@ export function createAuthGuard (
     // The orchestrator records `originalUri` from its own `getOriginalUri()` at redirect time, and
     // that default reads `window.location` — which, inside a `beforeEach` guard, is still the page
     // being left rather than `to`. The guard is the only place that knows the target route, so it
-    // owns this option. Assigned per-navigation rather than saved and restored: when a redirect does
-    // happen `getToken()` never returns, so there'd be no point at which to restore it.
+    // overrides the option for the duration of this call.
+    //
+    // Restored in `finally`: when `getToken()` *does* redirect the promise never settles and the
+    // restore never runs, which is fine — the page is gone. But when it resolves from storage (the
+    // common case) the override has to come back off, or every later flow started from outside this
+    // guard — a `signIn()` button, a step-up `getToken()`, a second guard with different options —
+    // would silently inherit this navigation's target as its `originalUri`.
+    const previousGetOriginalUri = orchestrator.options.getOriginalUri
     orchestrator.options.getOriginalUri = () => originalUri(to)
 
-    const token = await orchestrator.getToken(typeof params === 'function' ? params(to) : params)
+    try {
+      const token = await orchestrator.getToken(typeof params === 'function' ? params(to) : params)
 
-    return token !== null
+      return token !== null
+    } finally {
+      orchestrator.options.getOriginalUri = previousGetOriginalUri
+    }
   }
 }

@@ -10,12 +10,15 @@
     ".": {
       "types": "./dist/bundles/types/index.d.ts",
       "import": "./dist/bundles/okta-vue.esm.js",
-      "require": "./dist/bundles/okta-vue.cjs.js"
+      "require": "./dist/bundles/okta-vue.cjs.js",
+      "default": "./dist/bundles/okta-vue.cjs.js"
     },
     "./client-js": {
       "types": "./dist/bundles/types/client-js/index.d.ts",
-      "import": "./dist/bundles/okta-vue-client-js.esm.js"
+      "import": "./dist/bundles/okta-vue-client-js.esm.js",
+      "default": "./dist/bundles/okta-vue-client-js.esm.js"
     },
+    "./bundles/*": "./dist/bundles/*",
     "./src/*": "./src/*",
     "./package.json": "./package.json"
   },

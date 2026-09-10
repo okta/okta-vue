@@ -19,7 +19,11 @@ module.exports = {
     ecmaVersion: 2020,
   },
   extends: [
-    'plugin:vue/essential',
+    // `plugin:vue/essential` is the *Vue 2* preset. This is a Vue 3 library (see the `vue@^3.0.0`
+    // peer range and @vue/vue3-jest), so it was applying rules that no longer hold — notably
+    // `vue/no-multiple-template-root`, which Vue 3 fragments make obsolete — while missing the
+    // Vue 3 ones.
+    'plugin:vue/vue3-essential',
     'eslint:recommended',
     '@vue/typescript/recommended'
   ],

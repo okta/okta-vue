@@ -10,11 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-<script lang="ts">
-import { h, ref, onBeforeMount, type Slot } from 'vue'
-import { useRouter } from 'vue-router'
-import { injectOktaClient } from '../context'
-
+<script setup lang="ts">
 /**
  * Route component for the OAuth redirect URI. Completes the authorization code exchange, then sends
  * the user on to wherever they were headed.
@@ -25,8 +21,10 @@ import { injectOktaClient } from '../context'
  * there. If you start flows yourself with a different `meta` shape, pass `restoreOriginalUri` to
  * `createOktaClient()` and read your own keys.
  *
- * Errors are surfaced the same way as the okta-auth-js `LoginCallback`: through an `error` scoped
- * slot if you provide one, otherwise rendered as plain text.
+ * Errors are surfaced through an `error` scoped slot if you provide one, otherwise rendered as plain
+ * text. The slot receives the thrown value itself rather than a pre-stringified message, so
+ * consumers can branch on an OAuth error code or `error.name`; Vue's own interpolation already
+ * renders an `Error` through `String()`, so `{{ error }}` reads the same either way.
  *
  * @example
  * ```ts
@@ -42,49 +40,44 @@ import { injectOktaClient } from '../context'
  * </LoginCallback>
  * ```
  */
-export default {
-  name: 'LoginCallback',
-  setup (_props: Record<string, never>, { slots }: { slots: { error?: Slot } }) {
-    const error = ref<string | null>(null)
-    const { orchestrator, restoreOriginalUri } = injectOktaClient()
-    const router = useRouter()
+import { onBeforeMount, shallowRef } from 'vue'
+import { useRouter } from 'vue-router'
+import { injectOktaClient } from '../context'
+import { toRelativeUri } from '../toRelativeUri'
 
-    onBeforeMount(async () => {
-      try {
-        const context = await orchestrator.resumeFlow(window.location.href)
-        const originalUri = typeof context?.originalUri === 'string' ? context.originalUri : '/'
+defineOptions({ name: 'LoginCallback' })
 
-        if (restoreOriginalUri) {
-          await restoreOriginalUri(originalUri)
-        } else if (router) {
-          await router.replace(toRelativeUri(originalUri))
-        }
-      } catch (e) {
-        error.value = String(e)
-      }
-    })
+const error = shallowRef<unknown>(null)
+const { orchestrator, restoreOriginalUri } = injectOktaClient()
+const router = useRouter()
 
-    return () => {
-      if (slots.error) {
-        return h('div', slots.error({ error: error.value }))
-      }
-      return error.value
-    }
-  }
-}
-
-/**
- * Reduces `originalUri` to a router-navigable path. Anything pointing off-origin (or unparseable)
- * collapses to `/` rather than being handed to the router as-is.
- */
-function toRelativeUri (uri: string): string {
+onBeforeMount(async () => {
   try {
-    const url = new URL(uri, window.location.origin)
-    return url.origin === window.location.origin
-      ? `${url.pathname}${url.search}${url.hash}`
-      : '/'
-  } catch {
-    return '/'
+    const context = await orchestrator.resumeFlow(window.location.href)
+    const originalUri = typeof context?.originalUri === 'string' ? context.originalUri : '/'
+
+    if (restoreOriginalUri) {
+      // Handed the recorded value as-is: the consumer owns the navigation and may well want the
+      // absolute URL. Only the router path below has to be same-origin and relative.
+      await restoreOriginalUri(originalUri)
+      return
+    }
+
+    // No `if (router)` guard: this is a route component, so a router is installed by definition.
+    // Were it somehow missing, `useRouter()` returns `undefined` and the resulting `TypeError`
+    // surfaces through the `catch` below — which beats completing the token exchange and then
+    // silently stranding the user on the callback URL with nothing rendered.
+    await router.replace(toRelativeUri(originalUri))
+  } catch (e) {
+    error.value = e
   }
-}
+})
 </script>
+
+// No wrapper element: a bare slot renders the consumer's vnodes (or the fallback text) directly, so
+// this component adds nothing to their layout. The fallback content is the no-slot-provided case.
+// This note lives out here rather than in the template block, where the SFC compiler would turn it
+// into a comment vnode emitted on every render.
+<template>
+  <slot name="error" :error="error">{{ error }}</slot>
+</template>

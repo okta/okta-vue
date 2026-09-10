@@ -37,6 +37,8 @@ module.exports = {
     '.*\\.(vue)$': '@vue/vue3-jest'
   },
   transformIgnorePatterns: [
+    // Not a mangled "diagnostics": `nostics` is a real package (vercel-labs), pulled in as an
+    // ESM-only transitive dependency of vue-router 5. Jest has to transform it.
     '/node_modules/(?!(nostics)/)'
   ],
   moduleNameMapper: {

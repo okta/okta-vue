@@ -25,6 +25,19 @@ declare const PACKAGE: {
   version: string;
 }
 
+// `addEnv` appends to a module-level list that builds the `X-Okta-User-Agent-Extended` header, so
+// registering the same string again on a second `install()` — two Vue apps on the page, or a test
+// suite mounting repeatedly — would repeat it in every request.
+let userAgentRegistered = false
+
+function registerUserAgent (): void {
+  if (userAgentRegistered) {
+    return
+  }
+  userAgentRegistered = true
+  addEnv(`${PACKAGE.name}/${PACKAGE.version}`)
+}
+
 /**
  * Creates the `@okta/okta-client-javascript` plugin for a Vue app.
  *
@@ -58,6 +71,9 @@ declare const PACKAGE: {
  * ```
  */
 export function createOktaClient (options: OktaClientOptions): OktaClient {
+  // `?? {}` is load-bearing despite `options` being a required parameter: JS callers can still reach
+  // `createOktaClient()`, and destructuring `undefined` would throw a bare `TypeError` before the
+  // check below could report the actual problem. The cast is what lets TS destructure the union.
   const { orchestrator, fetchClient, signOutFlow, restoreOriginalUri } = options ?? {} as OktaClientOptions
 
   if (!orchestrator) {
@@ -77,7 +93,7 @@ export function createOktaClient (options: OktaClientOptions): OktaClient {
     authGuard: createAuthGuard(orchestrator),
 
     install (app: App) {
-      addEnv(`${PACKAGE.name}/${PACKAGE.version}`)
+      registerUserAgent()
       app.provide(OktaClientKey, context)
     }
   }

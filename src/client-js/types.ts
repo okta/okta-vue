@@ -105,10 +105,11 @@ export interface AuthGuardOptions {
    * Where the user should land after signing in. Defaults to `to => to.fullPath`, matching the
    * `setOriginalUri(to.fullPath)` behavior of the `@okta/okta-auth-js`-based `navigationGuard`.
    *
-   * The guard assigns this onto `orchestrator.options.getOriginalUri`, because only the guard knows
-   * the route being *entered* — the orchestrator's own default can only read `window.location`,
-   * which during a `beforeEach` guard is still the page being left. To keep the orchestrator's
-   * default instead, pass `() => toRelativeUrl(window.location.href)`.
+   * The guard installs this onto `orchestrator.options.getOriginalUri` for the duration of its
+   * `getToken()` call and restores the previous value afterwards, because only the guard knows the
+   * route being *entered* — the orchestrator's own default can only read `window.location`, which
+   * during a `beforeEach` guard is still the page being left. To keep the orchestrator's default
+   * instead, pass `() => toRelativeUrl(window.location.href)`.
    */
   originalUri?: (to: RouteLocationNormalized) => string
 
@@ -160,8 +161,11 @@ export interface UseOktaAuthReturn {
 
 export type UseOktaFetchOptions<T> = OktaFetchInit & {
   /**
-   * Fetch immediately on setup, and again whenever a reactive `resource` changes. Defaults to
-   * `true`; pass `false` to fetch only via the returned `refresh()`.
+   * Fetch on setup. Defaults to `true`; pass `false` to defer the first request to the returned
+   * `refresh()`.
+   *
+   * This only controls the *first* request, matching what `immediate` means everywhere else in Vue.
+   * A reactive `resource` still re-fetches when it changes either way.
    */
   immediate?: boolean
 
@@ -171,22 +175,31 @@ export type UseOktaFetchOptions<T> = OktaFetchInit & {
   parse?: (response: Response) => Promise<T>
 }
 
+/**
+ * The reactive state returned by {@link useOktaFetch}.
+ *
+ * All four state refs are readonly: they are outputs of the request, and a consumer write would be
+ * silently overwritten by the next fetch. Re-run the request with `refresh()` instead.
+ */
 export interface UseOktaFetchReturn<T> {
   /** The parsed body of the most recent successful response, or `null`. */
-  data: Ref<T | null>
+  data: Readonly<Ref<T | null>>
 
   /**
    * The thrown error, or — for a non-2xx response — the `Response` itself. `null` while the request
    * is in flight and after it succeeds.
+   *
+   * A request aborted because a newer one superseded it, or because the component unmounted, is not
+   * reported here. One aborted through a `signal` you passed in yourself is.
    */
-  error: Ref<unknown>
+  error: Readonly<Ref<unknown>>
 
   /** `true` from the moment a request starts until it settles. */
-  isLoading: Ref<boolean>
+  isLoading: Readonly<Ref<boolean>>
 
-  /** The most recent `Response`, whether or not it was successful. */
-  response: Ref<Response | null>
+  /** The most recent `Response`, whether or not it was successful. `null` if the request threw. */
+  response: Readonly<Ref<Response | null>>
 
-  /** Re-runs the request. Resolves once `data`/`error` reflect the result. */
+  /** Re-runs the request, aborting any still in flight. Resolves once `data`/`error` reflect the result. */
   refresh: () => Promise<void>
 }

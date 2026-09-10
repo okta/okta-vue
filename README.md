@@ -556,7 +556,9 @@ same resolve/refresh/redirect logic before every request.
   they sign in. Defaults to `to => to.fullPath`, matching the auth-js path's
   `setOriginalUri(to.fullPath)`. The guard owns this because it is the only place that knows the
   route being *entered* — inside a `beforeEach` guard, `window.location` still points at the page
-  being left.
+  being left. It is installed onto the orchestrator only for the duration of that one `getToken()`
+  call and then restored, so any `getOriginalUri` you configured on the orchestrator yourself still
+  applies to a `signIn()` button or a step-up `getToken()` elsewhere in the app.
 - `params` *(optional)*: Extra `AuthorizeParams` (`scopes`, `acrValues`, `maxAge`, …) for the guard's
   token request, or a function deriving them from the route:
   `to => ({ scopes: to.meta.scopes })`.
@@ -575,6 +577,19 @@ one:
   </template>
 </LoginCallback>
 ```
+
+The slot receives the thrown value itself, not a pre-stringified message, so you can branch on an
+OAuth error code or `error.name`. Vue's interpolation already renders an `Error` through `String()`,
+so the default `{{ error }}` output reads the same.
+
+The component renders no wrapper element — the slot content (or the fallback text) goes straight into
+your layout.
+
+`originalUri` comes out of the flow context, which is untyped external data. Before handing it to
+`router.replace()` the component reduces it to a same-origin path, so a value that points off-origin
+or doesn't parse falls back to `/`. A `restoreOriginalUri` you supply yourself receives the recorded
+value **as-is**, since you own that navigation and may want the absolute URL — validate it if it
+could have come from anywhere but your own `createAuthGuard`.
 
 ### Show login and logout buttons
 
@@ -602,9 +617,19 @@ logout URL past a URL length limit — drive it from your own `SessionLogoutFlow
 
 ```typescript
 import { SessionLogoutFlow } from '@okta/spa-platform'
-import { signOutFlow } from './okta'
+import { orchestrator, signOutFlow } from './okta'
 
-await SessionLogoutFlow.PerformPostRedirect(await signOutFlow.start(idToken))
+const credential = await orchestrator.selectCredential({})
+
+// Read the raw id_token first: `revoke('ALL')` removes the credential from storage as well as
+// revoking it at the authorization server, so it is unreadable afterwards.
+const idToken = credential?.token.idToken?.rawValue
+
+await credential?.revoke('ALL')
+
+if (idToken) {
+  await SessionLogoutFlow.PerformPostRedirect(await signOutFlow.start(idToken))
+}
 ```
 
 ### Fetch protected resources
@@ -631,21 +656,28 @@ const { data, error, isLoading } = useOktaFetch<Message[]>('/api/messages')
 </template>
 ```
 
-Pass a `ref` or a getter to re-fetch whenever it changes. Responses that arrive out of order are
-discarded, so `data` always reflects the most recent request:
+Pass a `ref` or a getter to re-fetch whenever it changes. The superseded request is aborted, and any
+response that still arrives out of order is discarded, so `data` always reflects the most recent
+request:
 
 ```typescript
 const route = useRoute()
 const { data } = useOktaFetch(() => `/api/users/${route.params.userId}/messages`)
 ```
 
-`useOktaFetch(resource, options?)` returns `{ data, error, isLoading, response, refresh }`. `error`
-holds a thrown error, or — for a non-2xx response — the `Response` itself. Beyond `immediate` and
-`parse` below, remaining options are forwarded to `FetchClient.fetch()` as the request init, so
-`method`, `headers`, `body`, `scopes` and friends all work:
+The in-flight request is also aborted when the owning component unmounts. Aborts the composable
+performs itself are not reported as errors; one triggered through a `signal` you passed in is.
 
-- `immediate` *(optional)*: Fetch during setup, and again whenever a reactive `resource` changes.
-  Defaults to `true`; pass `false` to fetch only via `refresh()`.
+`useOktaFetch(resource, options?)` returns `{ data, error, isLoading, response, refresh }`. The four
+state values are **readonly** refs — they're outputs, and a write to `data.value` would be clobbered
+by the next fetch anyway. Call `refresh()` to re-run the request. `error` holds a thrown error, or —
+for a non-2xx response — the `Response` itself. Beyond `immediate` and `parse` below, remaining
+options are forwarded to `FetchClient.fetch()` as the request init, so `method`, `headers`, `body`,
+`scopes`, `signal` and friends all work:
+
+- `immediate` *(optional)*: Whether to fetch during setup. Defaults to `true`; pass `false` to skip
+  the initial request. This only affects that first request — a reactive `resource` still re-fetches
+  when it changes, matching what `immediate` means for `watch`.
 - `parse` *(optional)*: Turns a successful `Response` into `data`. Defaults to
   `response => response.json()`.
 
@@ -696,11 +728,22 @@ import { OktaClientKey } from '@okta/okta-vue/client-js'
 const { orchestrator, fetchClient } = inject(OktaClientKey)!
 ```
 
-### Known caveat
+### Known caveats
 
 `@okta/okta-auth-js` is still a required peer dependency of `@okta/okta-vue`, so a project using
 only this subpath will see a peer-dependency warning for it. Making it optional is a breaking change
 and is deferred to the next major version.
+
+This subpath is **browser-only**, like `@okta/spa-platform` itself. Credentials live in browser
+storage, `signOut()` navigates with `window.location.assign()`, and `LoginCallback` reads the
+redirect result off `window.location.href`. Under SSR — Nuxt, `vite-ssr`, `@vue/server-renderer` —
+none of that exists on the server. Installing the plugin is safe (`createOktaClient()` touches no
+browser API), but keep the pieces that do on the client:
+
+- Render `LoginCallback` client-side only (in Nuxt, a `<ClientOnly>` wrapper or a `.client` page).
+- Register `okta.authGuard` inside a client-only plugin, so it never runs during server rendering.
+- Call `useOktaFetch()` with `immediate: false` and `refresh()` from `onMounted`, or reach for
+  `useOktaFetchClient()` in an event handler, if the component also renders on the server.
 
 ## Migrating
 

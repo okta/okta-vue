@@ -17,8 +17,10 @@ export { FetchClient, addEnv } from '@okta/spa-platform'
 /**
  * An `AuthorizationCodeFlowOrchestrator` double.
  *
- * `options` is a real mutable object because `createAuthGuard` assigns `options.getOriginalUri` onto
- * it, and asserting on that assignment is how we verify the originalUri behavior.
+ * `options` is a real mutable object because `createAuthGuard` installs `options.getOriginalUri` onto
+ * it for the duration of its `getToken()` call. Since the guard restores the previous value
+ * afterwards, specs capture it from inside a `getToken` implementation rather than reading it after
+ * the guard resolves.
  */
 export function createOrchestrator (overrides = {}) {
   return {

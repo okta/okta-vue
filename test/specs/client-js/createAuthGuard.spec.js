@@ -62,9 +62,21 @@ describe('createAuthGuard', () => {
     })
 
     describe('originalUri', () => {
+      // The override is only installed for the duration of `getToken()`, so it has to be read from
+      // inside it — which is also the only moment the orchestrator itself would ever call it.
+      function captureOriginalUri () {
+        let recorded
+        orchestrator.getToken.mockImplementation(() => {
+          recorded = orchestrator.options.getOriginalUri()
+          return Promise.resolve({ accessToken: { rawValue: 'fake-access-token' } })
+        })
+        return () => recorded
+      }
+
       it('records the target route, matching setOriginalUri(to.fullPath) on the auth-js path', async () => {
+        const recorded = captureOriginalUri()
         await createAuthGuard(orchestrator)(route({ requiresAuth: true }, '/protected?foo=bar'))
-        expect(orchestrator.options.getOriginalUri()).toBe('/protected?foo=bar')
+        expect(recorded()).toBe('/protected?foo=bar')
       })
 
       it('is not recorded for unguarded routes', async () => {
@@ -73,9 +85,31 @@ describe('createAuthGuard', () => {
       })
 
       it('can be derived from the route', async () => {
+        const recorded = captureOriginalUri()
         const guard = createAuthGuard(orchestrator, { originalUri: to => `${to.fullPath}#deep` })
         await guard(route({ requiresAuth: true }))
-        expect(orchestrator.options.getOriginalUri()).toBe('/protected#deep')
+        expect(recorded()).toBe('/protected#deep')
+      })
+
+      // Without the restore, one guarded navigation would permanently pin the orchestrator's
+      // `originalUri` to that route — so a later `signIn()` button, or a step-up `getToken()` from a
+      // component, would send the user back to the wrong place after authenticating.
+      it('restores the orchestrator option once the token resolves', async () => {
+        const previous = () => '/from-consumer-config'
+        orchestrator.options.getOriginalUri = previous
+
+        await createAuthGuard(orchestrator)(route({ requiresAuth: true }))
+
+        expect(orchestrator.options.getOriginalUri).toBe(previous)
+      })
+
+      it('restores the orchestrator option when getToken() throws', async () => {
+        orchestrator.options.getOriginalUri = undefined
+        orchestrator.getToken.mockRejectedValue(new Error('token endpoint exploded'))
+
+        await expect(createAuthGuard(orchestrator)(route({ requiresAuth: true }))).rejects.toThrow()
+
+        expect(orchestrator.options.getOriginalUri).toBeUndefined()
       })
     })
 
@@ -138,12 +172,19 @@ describe('createAuthGuard', () => {
     })
 
     it('records the full path of the route being entered, not the one being left', async () => {
+      let recorded
+      orchestrator.getToken.mockImplementation(() => {
+        recorded = orchestrator.options.getOriginalUri()
+        return Promise.resolve({ accessToken: { rawValue: 'fake-access-token' } })
+      })
+
       bootstrap()
       router.push({ path: '/' })
       await router.isReady()
       router.push({ path: '/protected', query: { tab: 'profile' } })
+
       await waitForExpect(() => {
-        expect(orchestrator.options.getOriginalUri()).toBe('/protected?tab=profile')
+        expect(recorded).toBe('/protected?tab=profile')
       })
     })
 
