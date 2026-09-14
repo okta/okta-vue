@@ -15,7 +15,7 @@ import { h, ref, onBeforeMount, Slot } from 'vue'
 import { useAuth } from '../okta-vue'
 
 export default {
-  setup(_props: {}, { slots }: { slots: { error?: Slot } }) {
+  setup(_props: Record<string, never>, { slots }: { slots: { error?: Slot } }) {
     const error = ref<string | null>(null);
     const $auth = useAuth();
     onBeforeMount(async () => {

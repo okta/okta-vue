@@ -4,7 +4,7 @@ import { terser } from 'rollup-plugin-terser'
 import cleanup from 'rollup-plugin-cleanup'
 import typescript from 'rollup-plugin-typescript2'
 import commonjs from '@rollup/plugin-commonjs'
-import pkg from './package.json'
+import pkg from './package.json' with { type: 'json' }
 
 const packageInfo = {
   name: pkg.name,
@@ -35,7 +35,11 @@ const commonPlugins = [
         minSupportedVersion: '5.3.1'
       })
     },
-    preventAssignment: true
+    preventAssignment: true,
+    // default delimiters (as of v5+) exclude matches followed by `.`, but PACKAGE/AUTH_JS
+    // are only ever referenced via property access (e.g. PACKAGE.name), so that guard
+    // must be dropped or these replacements never fire.
+    delimiters: ['(?<![_$a-zA-Z0-9\\xA0-\\uFFFF])', '(?![_$a-zA-Z0-9\\xA0-\\uFFFF])']
   }),
   cleanup()
 ]

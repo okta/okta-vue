@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { App, shallowRef, triggerRef, version } from 'vue'
+import { App, shallowRef, triggerRef } from 'vue'
 import { Router, RouteLocationNormalized } from 'vue-router'
 import { AuthSdkError, OktaAuth, AuthState, toRelativeUrl } from '@okta/okta-auth-js'
 import { compare } from 'compare-versions';
