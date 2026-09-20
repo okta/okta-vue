@@ -12,10 +12,15 @@ module.exports = {
   ],
   overrides: [
     {
-      // Jest
-      files: ['**/test/specs/**/*.spec.{j,t}s?(x)'],
+      // Jest specs, and the test doubles they share
+      files: [
+        '**/test/specs/**/*.spec.{j,t}s?(x)',
+        '**/test/mocks/**/*.{j,t}s?(x)'
+      ],
       env: {
         jest: true,
+        // These run under jsdom, so window/document/URL are available.
+        browser: true,
         es6: true
       },
       parserOptions: {

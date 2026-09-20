@@ -42,6 +42,26 @@ packageJSON.scripts.prepare = '';
   }
 })
 
+// ...and from every path in the subpath `exports` map, which nests one or two levels deep.
+const stripDist = value => typeof value === 'string'
+  ? value.replace('dist/', '')
+  : Object.fromEntries(Object.entries(value).map(([key, val]) => [key, stripDist(val)]))
+
+if (packageJSON.exports) {
+  packageJSON.exports = stripDist(packageJSON.exports)
+}
+
 fs.writeFileSync(`./${NPM_DIR}/package.json`, JSON.stringify(packageJSON, null, 4))
+
+// Resolvers that predate `exports` (TypeScript's `moduleResolution: "node"`, older bundlers) ignore
+// the map above entirely, and would report `@okta/okta-vue/client-js` as unresolvable. A stub
+// directory with its own package.json makes the subpath resolvable the old way too. No `main`: the
+// bundle is ESM-only, see rollup.config.js.
+shell.echo(`Writing ${NPM_DIR}/client-js resolution stub`)
+shell.mkdir(`-p`, `./${NPM_DIR}/client-js`)
+fs.writeFileSync(`./${NPM_DIR}/client-js/package.json`, JSON.stringify({
+  module: '../bundles/okta-vue-client-js.esm.js',
+  types: '../bundles/types/client-js/index.d.ts'
+}, null, 4))
 
 shell.echo(chalk.green(`End building`))
